@@ -1,0 +1,6 @@
+[extend]
+useDefault = true
+
+[allowlist]
+description = "Obvious fake key used as a test fixture"
+regexes = ['''kweli-test-secret-not-real''']

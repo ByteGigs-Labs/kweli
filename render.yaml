@@ -1,0 +1,54 @@
+# Render Blueprint. Dashboard: New > Blueprint > pick this repo.
+# Secrets marked `sync: false` are entered in the Render dashboard, never committed.
+# Before submission (12 Nov): move kweli-api off the free plan so judges don't hit a cold start,
+# and check the free Postgres expiry. Judging runs until 21 Dec 2026.
+services:
+  - type: web
+    name: kweli-api
+    runtime: docker
+    dockerfilePath: ./api/Dockerfile
+    dockerContext: .
+    plan: free
+    region: frankfurt
+    healthCheckPath: /health
+    autoDeploy: true
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: kweli-db
+          property: connectionString
+      - key: PAYPAL_ENV
+        value: sandbox
+      - key: PAYPAL_CLIENT_ID
+        sync: false
+      - key: PAYPAL_CLIENT_SECRET
+        sync: false
+      - key: PAYPAL_WEBHOOK_ID
+        sync: false
+      - key: ANTHROPIC_API_KEY
+        sync: false
+      - key: VAULT_MASTER_KEY
+        sync: false
+      - key: CORS_ORIGINS
+        sync: false
+      - key: COOKIE_SECURE
+        value: "true"
+
+  # Added on Day 1 when web/ exists (task M-09):
+  # - type: web
+  #   name: kweli-web
+  #   runtime: static
+  #   rootDir: web
+  #   buildCommand: npm ci && npm run build
+  #   staticPublishPath: dist
+  #   routes:
+  #     - type: rewrite
+  #       source: /*
+  #       destination: /index.html
+
+databases:
+  - name: kweli-db
+    plan: free
+    region: frankfurt
+    databaseName: kweli
+    user: kweli
