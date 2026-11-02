@@ -12,6 +12,7 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  # The web job (lint, typecheck, test, build, npm audit) is added with web/ on Day 1 (task M-09).
   backend:
     runs-on: ubuntu-latest
     steps:
@@ -25,26 +26,6 @@ jobs:
       - run: ruff format --check .
       - run: pytest -q --cov=api --cov=paypal --cov-fail-under=80
       - run: pip-audit -r requirements.txt
-
-  web:
-    if: hashFiles('web/package.json') != ''
-    runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: web
-    steps:
-      - uses: actions/checkout@v7
-      - uses: actions/setup-node@v7
-        with:
-          node-version: 22
-          cache: npm
-          cache-dependency-path: web/package-lock.json
-      - run: npm ci
-      - run: npm run lint --if-present
-      - run: npm run typecheck --if-present
-      - run: npm test --if-present
-      - run: npm run build
-      - run: npm audit --audit-level=high
 
   secrets:
     runs-on: ubuntu-latest
