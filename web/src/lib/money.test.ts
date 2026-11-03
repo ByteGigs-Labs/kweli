@@ -1,6 +1,8 @@
 import { formatMoney } from "./money";
 
 test("formats minor units with the currency's decimals", () => {
-  expect(formatMoney(80000, "USD", "en-US")).toBe("$800.00");
-  expect(formatMoney(1500, "JPY", "en-US")).toBe("¥1,500");
+  const plain = (text: string) => text.replace(/\s/g, " ");
+  expect(plain(formatMoney(80000, "USD"))).toBe("USD 800.00");
+  expect(plain(formatMoney(150000, "EUR"))).toBe("EUR 1,500.00");
+  expect(plain(formatMoney(1500, "JPY"))).toBe("JPY 1,500");
 });

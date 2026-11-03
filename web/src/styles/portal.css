@@ -1,0 +1,48 @@
+.portal {
+  min-height: 100%;
+}
+
+.portal-head {
+  padding: calc(var(--space) * 2.5) calc(var(--space) * 3);
+  border-bottom: 1px solid var(--line);
+  background: var(--surface);
+}
+
+.portal-body {
+  max-width: 760px;
+  margin: 0 auto;
+  padding: calc(var(--space) * 5) calc(var(--space) * 2);
+}
+
+.portal-body h1 {
+  font-size: var(--step-3);
+  font-weight: 750;
+}
+
+.portal-body h2 {
+  font-size: var(--step-1);
+  margin-bottom: var(--space);
+}
+
+.check {
+  display: flex;
+  gap: calc(var(--space) * 1.5);
+  align-items: flex-start;
+  font-weight: 500;
+}
+
+.check input {
+  width: 22px;
+  height: 22px;
+  margin-top: 2px;
+  accent-color: var(--seal);
+}
+
+.portal-done {
+  margin: 0;
+  padding: calc(var(--space) * 2);
+  border-radius: var(--radius-control);
+  background: var(--seal-wash);
+  color: var(--seal);
+  font-weight: 600;
+}

@@ -8,6 +8,17 @@ import { authProvider } from "./providers/authProvider";
 import { dataProvider } from "./providers/dataProvider";
 
 const LedgerPage = lazy(() => import("./pages/Ledger").then((m) => ({ default: m.LedgerPage })));
+const AgreementsPage = lazy(() =>
+  import("./pages/agreements/List").then((m) => ({ default: m.AgreementsPage })),
+);
+const NewAgreementPage = lazy(() =>
+  import("./pages/agreements/New").then((m) => ({ default: m.NewAgreementPage })),
+);
+const AgreementDetailPage = lazy(() =>
+  import("./pages/agreements/Detail").then((m) => ({ default: m.AgreementDetailPage })),
+);
+const InvoicesPage = lazy(() => import("./pages/Invoices").then((m) => ({ default: m.InvoicesPage })));
+const PortalPage = lazy(() => import("./pages/Portal").then((m) => ({ default: m.PortalPage })));
 
 export default function App() {
   return (
@@ -16,7 +27,11 @@ export default function App() {
         dataProvider={dataProvider}
         authProvider={authProvider}
         routerProvider={routerProvider}
-        resources={[{ name: "ledger", list: "/ledger", meta: { label: "Proof ledger" } }]}
+        resources={[
+          { name: "ledger", list: "/ledger", meta: { label: "Proof ledger" } },
+          { name: "agreements", list: "/agreements", show: "/agreements/:id", create: "/agreements/new" },
+          { name: "invoices", list: "/invoices" },
+        ]}
         options={{ syncWithLocation: false, disableTelemetry: true }}
       >
         <Routes>
@@ -31,6 +46,10 @@ export default function App() {
           >
             <Route index element={<Navigate to="/ledger" replace />} />
             <Route path="/ledger" element={<LedgerPage />} />
+            <Route path="/agreements" element={<AgreementsPage />} />
+            <Route path="/agreements/new" element={<NewAgreementPage />} />
+            <Route path="/agreements/:id" element={<AgreementDetailPage />} />
+            <Route path="/invoices" element={<InvoicesPage />} />
           </Route>
           <Route
             element={
@@ -41,6 +60,14 @@ export default function App() {
           >
             <Route path="/login" element={<LoginPage />} />
           </Route>
+          <Route
+            path="/p/:token"
+            element={
+              <Suspense fallback={null}>
+                <PortalPage />
+              </Suspense>
+            }
+          />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </Refine>

@@ -36,17 +36,21 @@ def _record(db: Session, key: str) -> None:
 def _too_many(retry_after: int) -> HTTPException:
     return HTTPException(
         status.HTTP_429_TOO_MANY_REQUESTS,
-        "Too many login attempts. Try again later.",
+        "Too many attempts. Try again later.",
         headers={"Retry-After": str(retry_after)},
     )
 
 
-def login_ip_limit(request: Request, db: Session = Depends(get_db)) -> None:
+def limit_by_ip(db: Session, request: Request, scope: str, per_minute: int) -> None:
     ip = request.client.host if request.client else "unknown"
-    key = _key("ip", ip)
-    if _count_since(db, key, timedelta(minutes=1)) >= get_settings().login_ip_per_minute:
+    key = _key(scope, ip)
+    if _count_since(db, key, timedelta(minutes=1)) >= per_minute:
         raise _too_many(60)
     _record(db, key)
+
+
+def login_ip_limit(request: Request, db: Session = Depends(get_db)) -> None:
+    limit_by_ip(db, request, "ip", get_settings().login_ip_per_minute)
 
 
 def ensure_account_not_locked(db: Session, email: str) -> None:

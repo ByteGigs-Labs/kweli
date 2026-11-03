@@ -61,6 +61,7 @@ a {
   color: var(--paper);
   font: inherit;
   font-weight: 600;
+  text-decoration: none;
   cursor: pointer;
 }
 
@@ -109,8 +110,12 @@ a {
 }
 
 /* Proof chain */
-.tabular {
-  font-variant-numeric: tabular-nums;
+/* This face spaces "." and "," wide in tabular mode, and Chrome uses tabular figures for list
+   markers by default. */
+::marker,
+.grid-frame .ag-root-wrapper,
+.grid-frame .ag-cell {
+  font-variant-numeric: normal;
 }
 
 .chain {
@@ -233,4 +238,186 @@ a {
 
 .badge-none {
   color: var(--ink-soft);
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  min-height: 24px;
+  padding: 0 10px;
+  border-radius: 999px;
+  font-size: var(--step--1);
+  font-weight: 600;
+}
+
+.chip-quiet {
+  background: color-mix(in srgb, var(--ink) 8%, transparent);
+  color: var(--ink-soft);
+}
+
+.chip-wait {
+  background: var(--gap-wash);
+  color: var(--gap);
+}
+
+.chip-done {
+  background: var(--seal-wash);
+  color: var(--seal);
+}
+
+.chip-stop {
+  background: var(--break-wash);
+  color: var(--break);
+}
+
+.panel {
+  padding: calc(var(--space) * 3);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-panel);
+  background: var(--surface);
+}
+
+.panel h2 {
+  font-size: var(--step-1);
+  margin-bottom: calc(var(--space) * 1.5);
+}
+
+.panel p {
+  margin: 0 0 calc(var(--space) * 1.5);
+}
+
+.stack {
+  display: grid;
+  gap: calc(var(--space) * 2);
+}
+
+.row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: calc(var(--space) * 1.5);
+}
+
+.muted {
+  color: var(--ink-soft);
+}
+
+.field textarea,
+.field select {
+  padding: calc(var(--space) * 1.25) calc(var(--space) * 1.5);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-control);
+  background: var(--surface);
+  color: var(--ink);
+  font: inherit;
+}
+
+.field select {
+  min-height: 44px;
+}
+
+.field textarea {
+  min-height: 200px;
+  resize: vertical;
+  line-height: 1.5;
+}
+
+.field[data-missing="true"] input,
+.field[data-missing="true"] textarea {
+  border-color: var(--gap);
+  background: var(--gap-wash);
+}
+
+.field-hint {
+  font-size: var(--step--1);
+  color: var(--gap);
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: calc(var(--space) * 2);
+}
+
+.form-grid .span-2 {
+  grid-column: 1 / -1;
+}
+
+.note {
+  margin: 0;
+  padding: calc(var(--space) * 1.5) calc(var(--space) * 2);
+  border-radius: var(--radius-control);
+  background: var(--gap-wash);
+  color: var(--ink);
+}
+
+.note-info {
+  background: color-mix(in srgb, var(--focus) 10%, transparent);
+}
+
+.link-box {
+  display: flex;
+  gap: var(--space);
+}
+
+.link-box input {
+  flex: 1;
+  min-width: 0;
+  min-height: 44px;
+  padding: 0 calc(var(--space) * 1.5);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-control);
+  background: var(--paper);
+  color: var(--ink);
+  font: inherit;
+}
+
+.terms {
+  margin: 0;
+  padding-left: 1.25em;
+  display: grid;
+  gap: var(--space);
+  max-width: 70ch;
+}
+
+.facts {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  gap: var(--space) calc(var(--space) * 3);
+  margin: 0;
+}
+
+.facts dt {
+  color: var(--ink-soft);
+}
+
+.facts dd {
+  margin: 0;
+  font-weight: 600;
+}
+
+.detail-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1.4fr) minmax(280px, 1fr);
+  gap: calc(var(--space) * 3);
+  align-items: start;
+}
+
+.grid-frame-short {
+  height: 420px;
+}
+
+.ag-row {
+  cursor: default;
+}
+
+.clickable-rows .ag-row {
+  cursor: pointer;
+}
+
+@media (max-width: 860px) {
+  .form-grid,
+  .detail-layout {
+    grid-template-columns: minmax(0, 1fr);
+  }
 }

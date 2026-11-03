@@ -14,6 +14,11 @@ class Settings(BaseSettings):
     model_config = SettingsConfigDict(env_file=".env", extra="ignore")
 
     database_url: str
+    hmac_key: SecretStr
+    public_web_url: str = "http://localhost:5173"
+    agreement_link_days: int = 14
+    max_thread_chars: int = 20_000
+    portal_ip_per_minute: int = 30
     cors_origins: list[str] = ["http://localhost:5173"]
     cookie_name: str = "kweli_session"
     cookie_secure: bool = True
