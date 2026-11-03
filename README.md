@@ -111,7 +111,7 @@ Kweli's AI drafts and acts. **Deterministic rules decide what counts as proof.**
 |---|---|
 | Backend | Python 3.11+, FastAPI, Pydantic, SQLAlchemy + Alembic |
 | Agent | LangChain + `paypal-agent-toolkit` + Claude (model swappable) |
-| Frontend | React + TypeScript + Refine + Ant Design + **AG Grid** |
+| Frontend | React + TypeScript + Refine (headless) + **AG Grid**, custom design system |
 | PDF | WeasyPrint (Compliance Pack) |
 | Storage | PostgreSQL; documents encrypted (AES-GCM) on disk/object storage |
 | Hosting | **Render** (web service, static site, Postgres, background worker) |
@@ -164,12 +164,19 @@ Step-by-step guides: [PayPal sandbox](docs/setup-paypal-sandbox.md) · [Render](
 ```bash
 git clone https://github.com/ByteGigs-Labs/kweli.git && cd kweli
 cp .env.example .env     # PAYPAL_CLIENT_ID, PAYPAL_CLIENT_SECRET, PAYPAL_WEBHOOK_ID, ANTHROPIC_API_KEY, ...
-docker compose up --build
+docker compose up --build            # API + Postgres; runs migrations on start
 # API: http://localhost:8000/health · docs at http://localhost:8000/docs
+
+# Demo login (set DEMO_USER_PASSWORD in .env first, 10+ characters)
+docker compose exec api python -m scripts.seed
+
+# Web app (proxies /v1 to the API, so the session cookie stays same-origin)
+cd web && npm install && npm run dev  # http://localhost:5173
 
 # Check the PayPal sandbox app (credentials + enabled features)
 python3.12 -m venv .venv && source .venv/bin/activate && pip install -r requirements-dev.txt
 python -m scripts.check_paypal
+python -m scripts.create_sandbox_invoice --to <sandbox-client-email> --amount 10.00 --send
 ```
 
 To receive webhooks locally, expose the API (for example with `cloudflared tunnel`) and register `https://<tunnel>/v1/webhooks/paypal` in your app's webhook settings.
