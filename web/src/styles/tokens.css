@@ -1,0 +1,49 @@
+:root {
+  --paper: #f4f6f5;
+  --surface: #ffffff;
+  --ink: #14302a;
+  --ink-soft: #4a5f59;
+  --line: #d5ddd9;
+  --seal: #1e7a55;
+  --seal-wash: #e3f2ea;
+  --gap: #a8650f;
+  --gap-wash: #fbf0dc;
+  --break: #b3261e;
+  --break-wash: #fbe5e3;
+  --focus: #2457c5;
+  --rail-bg: #14302a;
+  --rail-fg: #f4f6f5;
+
+  --font: "Schibsted Grotesk Variable", "Segoe UI", system-ui, sans-serif;
+  --step--1: 0.833rem;
+  --step-0: 1rem;
+  --step-1: 1.2rem;
+  --step-2: 1.44rem;
+  --step-3: 2.074rem;
+  --step-4: 2.986rem;
+
+  --radius-control: 8px;
+  --radius-panel: 14px;
+  --space: 8px;
+  color-scheme: light;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --paper: #0f1f1b;
+    --surface: #152a25;
+    --ink: #e6efeb;
+    --ink-soft: #9fb3ac;
+    --line: #2a423c;
+    --seal: #5cc495;
+    --seal-wash: #18392d;
+    --gap: #e0a64a;
+    --gap-wash: #3a2c14;
+    --break: #f08a82;
+    --break-wash: #3d1d1b;
+    --focus: #8cb0ff;
+    --rail-bg: #0a1714;
+    --rail-fg: #e6efeb;
+    color-scheme: dark;
+  }
+}
