@@ -6,9 +6,8 @@ import "../styles/shell.css";
 
 const NAV: { to: string; label: string; ready: boolean }[] = [
   { to: "/ledger", label: "Proof ledger", ready: true },
-  { to: "/clients", label: "Clients", ready: false },
-  { to: "/agreements", label: "Agreements", ready: false },
-  { to: "/invoices", label: "Invoices", ready: false },
+  { to: "/agreements", label: "Agreements", ready: true },
+  { to: "/invoices", label: "Invoices", ready: true },
   { to: "/disputes", label: "Disputes", ready: false },
   { to: "/packs", label: "Compliance packs", ready: false },
 ];

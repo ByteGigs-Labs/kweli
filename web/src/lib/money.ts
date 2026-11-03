@@ -5,6 +5,7 @@ export function formatMoney(amountMinor: number, currency: string, locale = "en-
   return new Intl.NumberFormat(locale, {
     style: "currency",
     currency,
+    currencyDisplay: "code",
     minimumFractionDigits: digits,
     maximumFractionDigits: digits,
   }).format(amountMinor / 10 ** digits);

@@ -45,7 +45,6 @@ export function LedgerPage({ rows = [] }: { rows?: LedgerRow[] }) {
         headerName: "Amount",
         width: 120,
         type: "rightAligned",
-        cellClass: "tabular",
         valueFormatter: ({ value, data }) => (data ? formatMoney(value, data.currency) : ""),
       },
       ...RULES.map(
