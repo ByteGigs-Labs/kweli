@@ -8,6 +8,8 @@ os.environ["DATABASE_URL"] = TEST_DATABASE_URL
 os.environ["CORS_ORIGINS"] = '["http://localhost:5173"]'
 os.environ["COOKIE_SECURE"] = "false"
 os.environ["PAYPAL_ENV"] = "sandbox"
+os.environ["HMAC_KEY"] = "test-hmac-key"
+os.environ["PUBLIC_WEB_URL"] = "https://kweli.test"
 
 import pytest  # noqa: E402
 from alembic import command  # noqa: E402

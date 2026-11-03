@@ -2,6 +2,36 @@ from decimal import Decimal
 
 ZERO_DECIMAL_CURRENCIES = frozenset({"HUF", "JPY", "TWD"})
 
+# Currencies PayPal accepts for payments and invoices. KES is not one of them.
+SUPPORTED_CURRENCIES = frozenset(
+    {
+        "AUD",
+        "BRL",
+        "CAD",
+        "CHF",
+        "CNY",
+        "CZK",
+        "DKK",
+        "EUR",
+        "GBP",
+        "HKD",
+        "HUF",
+        "ILS",
+        "JPY",
+        "MXN",
+        "MYR",
+        "NOK",
+        "NZD",
+        "PHP",
+        "PLN",
+        "SEK",
+        "SGD",
+        "THB",
+        "TWD",
+        "USD",
+    }
+)
+
 
 def _exponent(currency: str) -> int:
     return 0 if currency.upper() in ZERO_DECIMAL_CURRENCIES else 2

@@ -4,10 +4,14 @@ from dataclasses import dataclass
 import httpx
 
 from api.config import Settings
+from paypal.errors import PayPalError
 
 
-class PayPalAuthError(RuntimeError):
-    pass
+class PayPalAuthError(PayPalError):
+    """Kweli couldn't get an access token: missing or wrong app credentials."""
+
+    def __init__(self, message: str, status: int = 0) -> None:
+        super().__init__(status, "AUTHENTICATION_FAILURE", message)
 
 
 @dataclass
@@ -38,7 +42,9 @@ def fetch_access_token(settings: Settings, client: httpx.Client | None = None) -
         if owns_client:
             client.close()
     if response.status_code != 200:
-        raise PayPalAuthError(f"PayPal rejected the credentials (HTTP {response.status_code})")
+        raise PayPalAuthError(
+            f"PayPal rejected the credentials (HTTP {response.status_code})", response.status_code
+        )
     body = response.json()
     return AccessToken(
         value=body["access_token"],
