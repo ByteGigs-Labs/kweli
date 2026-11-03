@@ -20,6 +20,12 @@ class Settings(BaseSettings):
     session_ttl_hours: int = 12
     max_body_bytes: int = 64 * 1024
     max_upload_bytes: int = 10 * 1024 * 1024
+    login_ip_per_minute: int = 20
+    login_account_failures_per_15_minutes: int = 5
+
+    demo_user_email: str = "amina@demo.kweli.test"
+    demo_user_name: str = "Amina Wanjiru"
+    demo_user_password: SecretStr | None = None
 
     paypal_env: Literal["sandbox", "live"] = "sandbox"
     paypal_client_id: str = ""
