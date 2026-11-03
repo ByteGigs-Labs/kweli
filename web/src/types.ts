@@ -1,0 +1,106 @@
+export interface Identity {
+  id: string;
+  email: string;
+  name: string;
+  plan: "free" | "pro";
+}
+
+export type ProofStatus = "pass" | "warn" | "fail";
+export type RuleId = "P1" | "P2" | "P3" | "P4" | "P5" | "P6" | "P7";
+
+export interface LedgerRow {
+  id: string;
+  received_at: string;
+  client: string;
+  amount_minor: number;
+  currency: string;
+  rules: Partial<Record<RuleId, ProofStatus>>;
+  status: ProofStatus;
+}
+
+export interface Client {
+  id: string;
+  name: string;
+  email: string;
+  country: string | null;
+  created_at: string;
+}
+
+export type AgreementStatus = "draft" | "sent" | "accepted" | "expired";
+
+export interface Agreement {
+  id: string;
+  client: Client;
+  title: string;
+  scope: string;
+  deliverables: string[];
+  amount: string;
+  amount_minor: number;
+  currency: string;
+  due_date: string | null;
+  status: AgreementStatus;
+  sent_at: string | null;
+  accepted_at: string | null;
+  created_at: string;
+  invoice_id: string | null;
+  terms?: string[];
+}
+
+export interface AgreementInput {
+  client: { name: string; email: string; country?: string | null };
+  title: string;
+  scope: string;
+  deliverables: string[];
+  amount: string;
+  currency: string;
+  due_date: string | null;
+}
+
+export interface EngagementDraft {
+  client_name: string | null;
+  client_email: string | null;
+  title: string | null;
+  scope: string | null;
+  deliverables: string[];
+  amount: string | null;
+  currency: string | null;
+  due_date: string | null;
+  missing: string[];
+  notes: string[];
+}
+
+export interface AcceptLink {
+  url: string;
+  expires_at: string;
+}
+
+export type InvoiceStatus = "draft" | "sent" | "paid" | "partially_paid" | "cancelled" | "refunded";
+
+export interface Invoice {
+  id: string;
+  agreement_id: string | null;
+  client_id: string;
+  paypal_invoice_id: string | null;
+  number: string;
+  description: string;
+  amount_minor: number;
+  currency: string;
+  due_date: string | null;
+  status: InvoiceStatus;
+  payer_view_url: string | null;
+  sent_at: string | null;
+  created_at: string;
+}
+
+export interface PortalAgreement {
+  freelancer: string;
+  client: string;
+  title: string;
+  deliverables: string[];
+  amount: string;
+  currency: string;
+  due_date: string | null;
+  terms: string[];
+  status: AgreementStatus;
+  accepted_at: string | null;
+}

@@ -17,6 +17,10 @@ services:
         fromDatabase:
           name: kweli-db
           property: connectionString
+      - key: HMAC_KEY
+        generateValue: true
+      - key: PUBLIC_WEB_URL
+        value: https://kweli-web.onrender.com
       - key: PAYPAL_ENV
         value: sandbox
       - key: PAYPAL_CLIENT_ID
@@ -30,21 +34,49 @@ services:
       - key: VAULT_MASTER_KEY
         sync: false
       - key: CORS_ORIGINS
+        value: '["https://kweli-web.onrender.com"]'
+      - key: DEMO_USER_PASSWORD
         sync: false
       - key: COOKIE_SECURE
         value: "true"
 
-  # Added on Day 1 when web/ exists (task M-09):
-  # - type: web
-  #   name: kweli-web
-  #   runtime: static
-  #   rootDir: web
-  #   buildCommand: npm ci && npm run build
-  #   staticPublishPath: dist
-  #   routes:
-  #     - type: rewrite
-  #       source: /*
-  #       destination: /index.html
+  - type: web
+    name: kweli-web
+    runtime: static
+    rootDir: web
+    buildCommand: npm ci && npm run build
+    staticPublishPath: dist
+    pullRequestPreviewsEnabled: false
+    headers:
+      - path: /*
+        name: Content-Security-Policy
+        # AG Grid's theming injects <style> tags, hence 'unsafe-inline' for styles only.
+        value: "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'self'"
+      - path: /*
+        name: X-Frame-Options
+        value: DENY
+      - path: /*
+        name: X-Content-Type-Options
+        value: nosniff
+      - path: /*
+        name: Referrer-Policy
+        value: no-referrer
+      - path: /*
+        name: Strict-Transport-Security
+        value: max-age=31536000; includeSubDomains
+      - path: /assets/*
+        name: Cache-Control
+        value: public, max-age=31536000, immutable
+    routes:
+      # The browser only ever talks to kweli-web, so the session cookie is first-party and
+      # SameSite=Strict works. onrender.com is a public suffix: kweli-web and kweli-api would
+      # otherwise be different sites and the cookie would never be sent.
+      - type: rewrite
+        source: /v1/*
+        destination: https://kweli-api.onrender.com/v1/*
+      - type: rewrite
+        source: /*
+        destination: /index.html
 
 databases:
   - name: kweli-db

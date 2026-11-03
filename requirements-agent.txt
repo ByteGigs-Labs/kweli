@@ -1,0 +1,11 @@
+# Agent dependencies, kept out of the API image until the agent ships (task F-11).
+#
+# paypal-agent-toolkit is installed WITHOUT its dependencies: its hard pins (langchain 0.3,
+# crewai-tools, openai-agents) pull in packages with known CVEs, and the parts Kweli uses only
+# need pydantic, httpx and requests. See docs/decisions/0001-agent-toolkit.md.
+#   pip install -r requirements-agent.txt
+#   pip install --no-deps paypal-agent-toolkit==1.11.0
+-r requirements.txt
+langchain-core==1.7.4
+langchain-anthropic==1.7.9
+requests==2.34.2

@@ -5,6 +5,7 @@ from api.config import get_settings
 from api.errors import install_error_handlers
 from api.limits import BodySizeLimit
 from api.logging_config import RequestLog, setup_logging
+from api.routes import agreements, auth, clients, invoices, portal
 
 
 def create_app() -> FastAPI:
@@ -21,6 +22,8 @@ def create_app() -> FastAPI:
     app.add_middleware(BodySizeLimit, upload_prefixes=("/v1/documents", "/v1/disputes"))
     app.add_middleware(RequestLog)
     install_error_handlers(app)
+    for module in (auth, clients, agreements, invoices, portal):
+        app.include_router(module.router)
 
     @app.get("/health")
     def health() -> dict[str, str]:

@@ -14,12 +14,23 @@ class Settings(BaseSettings):
     model_config = SettingsConfigDict(env_file=".env", extra="ignore")
 
     database_url: str
+    hmac_key: SecretStr
+    public_web_url: str = "http://localhost:5173"
+    agreement_link_days: int = 14
+    max_thread_chars: int = 20_000
+    portal_ip_per_minute: int = 30
     cors_origins: list[str] = ["http://localhost:5173"]
     cookie_name: str = "kweli_session"
     cookie_secure: bool = True
     session_ttl_hours: int = 12
     max_body_bytes: int = 64 * 1024
     max_upload_bytes: int = 10 * 1024 * 1024
+    login_ip_per_minute: int = 20
+    login_account_failures_per_15_minutes: int = 5
+
+    demo_user_email: str = "amina@demo.kweli.test"
+    demo_user_name: str = "Amina Wanjiru"
+    demo_user_password: SecretStr | None = None
 
     paypal_env: Literal["sandbox", "live"] = "sandbox"
     paypal_client_id: str = ""
