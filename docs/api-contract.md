@@ -52,6 +52,14 @@ Task **X-01**. After both of you approve this file, changes need a PR approved b
 | `GET /v1/billing` · `POST /v1/billing/subscribe` | Kweli Pro (PayPal Subscriptions) | Me |
 | `GET /v1/audit/verify` | Audit chain status | Me |
 
+## Agreement and invoice flow (as built)
+1. `POST /v1/agreements/extract {thread}` returns an `EngagementDraft`: the fields, plus `missing` (fields the thread didn't state) and `notes` (anything Kweli dropped). The model fills one fixed form, and any email or amount that isn't literally in the thread is removed. With no `ANTHROPIC_API_KEY` this returns 503, and the UI switches to filling in by hand.
+2. `POST /v1/agreements` stores the agreement and finds or creates the client by email (per user). The terms the client sees come from a fixed template (`agreement_text`). No AI writes contract terms.
+3. `POST /v1/agreements/{id}/send` returns `{url, expires_at}`. The token is shown once and stored as a SHA-256 hash, and a new link invalidates the old one. Links last 14 days.
+4. `GET /v1/portal/agreements/{token}` is public and shows no emails. `POST …/accept` needs the JSON body `{"accept": true}` (so a cross-site HTML form can't submit it). It records the time, an HMAC of the IP (never the IP itself) and the user agent. Accepting twice keeps the first time. Expired links return 410, and both portal routes are limited to 30 requests per minute per IP.
+5. `POST /v1/invoices {agreement_id, due_date?, note?}` requires an **accepted** agreement (409 otherwise). It creates a PayPal **draft** with `PayPal-Request-Id: kweli-invoice-{id}`, and is idempotent per agreement.
+6. `POST /v1/invoices/{id}/send` is the freelancer's explicit approval: PayPal emails the client, with `PayPal-Request-Id: kweli-send-{id}`, and repeat calls change nothing. PayPal errors come back as 502 ("Nothing was sent"), and credential problems as 503.
+
 ## Proof rule result (shared shape)
 
 ```json

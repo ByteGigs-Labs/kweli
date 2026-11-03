@@ -17,6 +17,10 @@ services:
         fromDatabase:
           name: kweli-db
           property: connectionString
+      - key: HMAC_KEY
+        generateValue: true
+      - key: PUBLIC_WEB_URL
+        value: https://kweli-web.onrender.com
       - key: PAYPAL_ENV
         value: sandbox
       - key: PAYPAL_CLIENT_ID
