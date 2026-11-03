@@ -1,6 +1,6 @@
 # Security Policy
 
-Kweli is a hackathon project that runs against the **PayPal sandbox only**. It must never hold live credentials or real customer data.
+Kweli is a project that runs against the **PayPal sandbox only**. It must never hold live credentials or real customer data.
 
 ## Reporting a vulnerability
 
