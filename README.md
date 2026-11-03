@@ -2,8 +2,7 @@
 
 > **Kweli** (Swahili: *true, truth*) is an AI agent that helps freelancers in emerging markets get paid on PayPal **with a complete, verifiable paper trail for every payment**. That way, when PayPal asks *"what is this money for?"*, the answer is ready in one click.
 
-**Built for:** PayPal AI Hackathon — *Build What's Next with PayPal and AI* (Devpost)
-**Live demo:** `https://kweli-api.onrender.com/health` (API, Day 0) *(PayPal sandbox)* · **Video:** `<YouTube link>` · **License:** MIT
+**Live demo:** `https://kweli-api.onrender.com/health` (API, Day 0) *(PayPal sandbox)* · **License:** MIT
 
 ---
 
