@@ -1,5 +1,8 @@
 import type {
   AcceptLink,
+  AgentAction,
+  AgentReply,
+  ChatMessage,
   Agreement,
   AgreementInput,
   EngagementDraft,
@@ -69,6 +72,16 @@ export const openDocument = async (id: string) => {
   const { url } = (await http.get<{ url: string }>(`/v1/documents/${encodeURIComponent(id)}/url`)).data;
   window.location.assign(url);
 };
+
+export const askAgent = async (messages: ChatMessage[]) =>
+  (await http.post<AgentReply>("/v1/agent/messages", { messages }, { timeout: 90000 })).data;
+
+export const approveAction = async (id: string, token: string) =>
+  (await http.post<AgentAction>(`/v1/agent/actions/${encodeURIComponent(id)}/approve`, { token }, { timeout: 60000 }))
+    .data;
+
+export const rejectAction = async (id: string) =>
+  (await http.post<AgentAction>(`/v1/agent/actions/${encodeURIComponent(id)}/reject`)).data;
 
 export const errorMessage = (failure: unknown, fallback: string) => {
   const data = (failure as { response?: { data?: { error?: { message?: string } } } }).response?.data;

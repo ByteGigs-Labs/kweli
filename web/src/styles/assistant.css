@@ -1,0 +1,129 @@
+.assistant {
+  display: grid;
+  gap: calc(var(--space) * 2);
+  max-width: 860px;
+}
+
+.chat {
+  display: grid;
+  gap: calc(var(--space) * 2);
+  align-content: start;
+  min-height: 320px;
+}
+
+.chat-empty {
+  display: grid;
+  gap: var(--space);
+}
+
+.bubble {
+  display: grid;
+  gap: calc(var(--space) * 1.5);
+  max-width: 100%;
+  padding: calc(var(--space) * 2) calc(var(--space) * 2.5);
+  border-radius: var(--radius-panel);
+}
+
+.bubble-user {
+  justify-self: end;
+  max-width: min(560px, 90%);
+  background: var(--ink);
+  color: var(--paper);
+}
+
+.bubble-assistant {
+  background: var(--surface);
+  border: 1px solid var(--line);
+}
+
+.bubble-text {
+  margin: 0;
+  white-space: pre-wrap;
+}
+
+.steps {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: var(--step--1);
+  color: var(--ink-soft);
+}
+
+.steps li {
+  padding: 2px 10px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--ink) 6%, transparent);
+}
+
+.steps li[data-ok="false"] {
+  background: var(--gap-wash);
+  color: var(--gap);
+}
+
+.approval {
+  display: grid;
+  gap: calc(var(--space) * 1.5);
+  padding: calc(var(--space) * 2);
+  border: 2px solid var(--ink);
+  border-radius: var(--radius-panel);
+  background: var(--paper);
+}
+
+.approval-executed {
+  border-color: var(--seal);
+}
+
+.approval-failed {
+  border-color: var(--break);
+}
+
+.approval-rejected {
+  border-style: dashed;
+  border-color: var(--line);
+}
+
+.approval-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: start;
+  gap: var(--space);
+}
+
+.approval-head h3 {
+  margin: 0;
+  font-size: var(--step-1);
+}
+
+.approval-note,
+.approval-result {
+  margin: 0;
+}
+
+.composer {
+  position: sticky;
+  bottom: 0;
+  display: flex;
+  gap: var(--space);
+  align-items: end;
+  padding: calc(var(--space) * 1.5) 0;
+  background: var(--paper);
+}
+
+.composer textarea {
+  flex: 1;
+  min-width: 0;
+  padding: calc(var(--space) * 1.25) calc(var(--space) * 1.5);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-control);
+  background: var(--surface);
+  color: var(--ink);
+  font: inherit;
+  resize: vertical;
+}
+
+.thinking {
+  margin: 0;
+}

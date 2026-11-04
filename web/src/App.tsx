@@ -18,6 +18,9 @@ const AgreementDetailPage = lazy(() =>
   import("./pages/agreements/Detail").then((m) => ({ default: m.AgreementDetailPage })),
 );
 const InvoicesPage = lazy(() => import("./pages/Invoices").then((m) => ({ default: m.InvoicesPage })));
+const AssistantPage = lazy(() =>
+  import("./pages/Assistant").then((m) => ({ default: m.AssistantPage })),
+);
 const PortalPage = lazy(() => import("./pages/Portal").then((m) => ({ default: m.PortalPage })));
 
 export default function App() {
@@ -31,6 +34,7 @@ export default function App() {
           { name: "ledger", list: "/ledger", meta: { label: "Proof ledger" } },
           { name: "agreements", list: "/agreements", show: "/agreements/:id", create: "/agreements/new" },
           { name: "invoices", list: "/invoices" },
+          { name: "assistant", list: "/assistant" },
         ]}
         options={{ syncWithLocation: false, disableTelemetry: true }}
       >
@@ -50,6 +54,7 @@ export default function App() {
             <Route path="/agreements/new" element={<NewAgreementPage />} />
             <Route path="/agreements/:id" element={<AgreementDetailPage />} />
             <Route path="/invoices" element={<InvoicesPage />} />
+            <Route path="/assistant" element={<AssistantPage />} />
           </Route>
           <Route
             element={
