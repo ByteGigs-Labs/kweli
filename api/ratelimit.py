@@ -49,6 +49,13 @@ def limit_by_ip(db: Session, request: Request, scope: str, per_minute: int) -> N
     _record(db, key)
 
 
+def limit_by_key(db: Session, scope: str, value: str, per_minute: int) -> None:
+    key = _key(scope, value)
+    if _count_since(db, key, timedelta(minutes=1)) >= per_minute:
+        raise _too_many(60)
+    _record(db, key)
+
+
 def login_ip_limit(request: Request, db: Session = Depends(get_db)) -> None:
     limit_by_ip(db, request, "ip", get_settings().login_ip_per_minute)
 

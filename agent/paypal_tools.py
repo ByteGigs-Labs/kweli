@@ -11,27 +11,9 @@ from functools import partial
 
 from langchain_core.tools import StructuredTool
 
+from agent.toolkit import ToolkitClientAdapter
 from paypal.client import PayPalClient
 from paypal.errors import PayPalError
-
-
-class ToolkitClientAdapter:
-    """The interface the toolkit's handlers call, backed by PayPalClient."""
-
-    def __init__(self, client: PayPalClient) -> None:
-        self.client = client
-
-    def post(self, uri: str, payload: dict | None = None) -> dict:
-        return self.client.post(uri, json=payload)
-
-    def get(self, uri: str) -> dict:
-        return self.client.get(uri)
-
-    def put(self, uri: str, payload: dict | None = None, headers: dict | None = None) -> dict:
-        return self.client.request("PUT", uri, json=payload)
-
-    def delete(self, uri: str) -> dict:
-        return self.client.request("DELETE", uri)
 
 
 def _execute(handler, adapter: ToolkitClientAdapter, method: str, **params) -> str:

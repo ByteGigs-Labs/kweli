@@ -15,3 +15,9 @@ def get_paypal() -> PayPalClient:
 
 def get_extractor() -> Extractor | None:
     return AnthropicExtractor.from_settings()
+
+
+def get_llm():
+    from agent.llm import AnthropicLLM
+
+    return AnthropicLLM.from_settings()

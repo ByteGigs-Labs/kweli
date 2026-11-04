@@ -6,6 +6,7 @@ from api.errors import install_error_handlers
 from api.limits import BodySizeLimit
 from api.logging_config import RequestLog, setup_logging
 from api.routes import (
+    agent,
     agreements,
     audit,
     auth,
@@ -42,6 +43,7 @@ def create_app() -> FastAPI:
         audit,
         documents,
         ledger,
+        agent,
     ):
         app.include_router(module.router)
 
