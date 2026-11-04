@@ -10,6 +10,9 @@ COPY alembic.ini .
 COPY migrations migrations
 COPY api api
 COPY paypal paypal
+COPY proof proof
+COPY audit audit
+COPY vault vault
 COPY scripts scripts
 
 RUN useradd --system --create-home kweli

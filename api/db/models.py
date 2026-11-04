@@ -9,6 +9,7 @@ from sqlalchemy import (
     ForeignKey,
     Index,
     Integer,
+    LargeBinary,
     String,
     Text,
     UniqueConstraint,
@@ -49,6 +50,7 @@ class User(Base):
     country: Mapped[str] = mapped_column(String(2), default="KE")
     password_hash: Mapped[str] = mapped_column(String(255))
     plan: Mapped[str] = mapped_column(String(10), default="free")
+    paypal_merchant_id: Mapped[str | None] = mapped_column(String(32), unique=True)
     is_active: Mapped[bool] = mapped_column(default=True)
     created_at: Mapped[datetime] = _created_at()
 
@@ -93,6 +95,9 @@ class Document(Base):
 
     id: Mapped[uuid.UUID] = _uuid_pk()
     user_id: Mapped[uuid.UUID] = _user_fk()
+    agreement_id: Mapped[uuid.UUID | None] = mapped_column(
+        ForeignKey("agreements.id", ondelete="SET NULL"), index=True
+    )
     kind: Mapped[str] = mapped_column(String(20))
     filename: Mapped[str] = mapped_column(String(255))
     mime: Mapped[str] = mapped_column(String(100))
@@ -101,6 +106,18 @@ class Document(Base):
     storage_key: Mapped[str] = mapped_column(String(255))
     encrypted_dek: Mapped[str] = mapped_column(String(255))
     created_at: Mapped[datetime] = _created_at()
+
+
+class DocumentBlob(Base):
+    """Encrypted file bytes, kept apart from the metadata so listings stay light."""
+
+    __tablename__ = "document_blobs"
+
+    document_id: Mapped[uuid.UUID] = mapped_column(
+        ForeignKey("documents.id", ondelete="CASCADE"), primary_key=True
+    )
+    nonce: Mapped[bytes] = mapped_column(LargeBinary(12))
+    ciphertext: Mapped[bytes] = mapped_column(LargeBinary)
 
 
 class Agreement(Base):
@@ -178,6 +195,7 @@ class Payment(Base):
     payer_email: Mapped[str | None] = mapped_column(String(254))
     payer_id: Mapped[str | None] = mapped_column(String(32))
     payer_name: Mapped[str | None] = mapped_column(String(200))
+    payer_resolved_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     amount_minor: Mapped[int] = mapped_column(BigInteger)
     currency: Mapped[str] = mapped_column(String(3))
     payment_type: Mapped[str] = mapped_column(String(16), default="unknown")
@@ -204,13 +222,13 @@ class ProofFlag(Base):
     __tablename__ = "proof_flags"
     __table_args__ = (
         UniqueConstraint("payment_id", "rule"),
-        _status_check("status", ("pass", "warn", "fail")),
+        _status_check("status", ("pass", "warn", "fail", "pending")),
     )
 
     id: Mapped[uuid.UUID] = _uuid_pk()
     payment_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("payments.id", ondelete="CASCADE"))
     rule: Mapped[str] = mapped_column(String(4))
-    status: Mapped[str] = mapped_column(String(4))
+    status: Mapped[str] = mapped_column(String(7))
     explanation: Mapped[str] = mapped_column(String(500))
     fix: Mapped[str | None] = mapped_column(String(500))
     evaluated_at: Mapped[datetime] = _created_at()
@@ -263,10 +281,14 @@ class AgentAction(Base):
 
 class WebhookEvent(Base):
     __tablename__ = "webhook_events"
+    __table_args__ = (_status_check("status", ("received", "processed", "ignored", "failed")),)
 
     paypal_event_id: Mapped[str] = mapped_column(String(64), primary_key=True)
     event_type: Mapped[str] = mapped_column(String(80))
+    resource_id: Mapped[str | None] = mapped_column(String(64))
     status: Mapped[str] = mapped_column(String(12), default="received")
+    attempts: Mapped[int] = mapped_column(Integer, default=0, server_default="0")
+    note: Mapped[str | None] = mapped_column(String(300))
     received_at: Mapped[datetime] = _created_at()
     processed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
 

@@ -50,6 +50,23 @@ const renderDetail = () =>
 
 afterEach(() => vi.restoreAllMocks());
 
+test("an uploaded deliverable completes that link of the chain", async () => {
+  vi.spyOn(api, "getAgreement").mockResolvedValue({ ...AGREEMENT, invoice_id: "i1" });
+  vi.spyOn(api, "getInvoice").mockResolvedValue({ ...INVOICE, status: "paid" });
+  vi.spyOn(api, "listDocuments").mockResolvedValue([
+    { id: "d1", agreement_id: "a1", kind: "deliverable", filename: "logo-final.pdf",
+      mime: "application/pdf", size: 52000, sha256: "x" },
+  ]);
+  renderDetail();
+  expect(await screen.findByRole("button", { name: "logo-final.pdf" })).toBeInTheDocument();
+  expect(screen.getByText("On file")).toBeInTheDocument();
+  expect((await screen.findAllByText("Paid")).length).toBeGreaterThan(0);
+});
+
+beforeEach(() => {
+  vi.spyOn(api, "listDocuments").mockResolvedValue([]);
+});
+
 test("draft first, then an explicit send that names the recipient", async () => {
   vi.spyOn(api, "getAgreement").mockResolvedValue(AGREEMENT);
   vi.spyOn(api, "getInvoice").mockResolvedValue(INVOICE);

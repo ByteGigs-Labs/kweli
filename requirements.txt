@@ -10,3 +10,4 @@ email-validator==2.3.0
 python-multipart==0.0.33
 httpx==0.28.1
 anthropic==2.4.0
+cryptography==50.0.2

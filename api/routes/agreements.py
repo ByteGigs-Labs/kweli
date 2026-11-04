@@ -13,6 +13,7 @@ from api.schemas import AcceptLink, AgreementIn, AgreementOut, ThreadIn
 from api.security import Principal, current_principal
 from api.services.agreements import agreement_text, find_or_create_client, issue_accept_link
 from api.services.extract import EngagementDraft, Extractor, check_against_thread
+from audit.log import record
 
 router = APIRouter(prefix="/v1/agreements", tags=["agreements"])
 SORTABLE = {"created_at": Agreement.created_at, "status": Agreement.status}
@@ -99,6 +100,18 @@ def create_agreement(
         due_date=body.due_date,
     )
     db.add(agreement)
+    db.flush()
+    record(
+        db,
+        principal.user_id,
+        "agreement.created",
+        {
+            "agreement_id": str(agreement.id),
+            "client_id": str(client.id),
+            "amount_minor": agreement.amount_minor,
+            "currency": agreement.currency,
+        },
+    )
     db.commit()
     return AgreementOut.build(owned_agreement(db, principal, agreement.id))
 
@@ -126,5 +139,6 @@ def send_for_acceptance(
     agreement = owned_agreement(db, principal, agreement_id)
     if agreement.status == "accepted":
         raise HTTPException(status.HTTP_409_CONFLICT, "The client has already accepted this")
+    record(db, principal.user_id, "agreement.link_issued", {"agreement_id": str(agreement.id)})
     url, expires = issue_accept_link(db, agreement)
     return AcceptLink(url=url, expires_at=expires)

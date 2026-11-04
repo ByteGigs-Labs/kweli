@@ -4,7 +4,10 @@ import type {
   AgreementInput,
   EngagementDraft,
   Invoice,
+  LedgerDetail,
+  LedgerRow,
   PortalAgreement,
+  StoredDocument,
 } from "../types";
 import { http } from "./http";
 
@@ -44,6 +47,28 @@ export const acceptPortal = async (token: string) =>
       accept: true,
     })
   ).data;
+
+export const listLedger = async () =>
+  (await http.get<LedgerRow[]>("/v1/ledger", { params: { _start: 0, _end: 100 } })).data;
+
+export const getLedgerEntry = async (id: string) =>
+  (await http.get<LedgerDetail>(`/v1/ledger/${encodeURIComponent(id)}`)).data;
+
+export const listDocuments = async (agreementId: string) =>
+  (await http.get<StoredDocument[]>("/v1/documents", { params: { agreement_id: agreementId } })).data;
+
+export const uploadDeliverable = async (agreementId: string, file: File) => {
+  const body = new FormData();
+  body.append("file", file);
+  body.append("kind", "deliverable");
+  body.append("agreement_id", agreementId);
+  return (await http.post<StoredDocument>("/v1/documents", body)).data;
+};
+
+export const openDocument = async (id: string) => {
+  const { url } = (await http.get<{ url: string }>(`/v1/documents/${encodeURIComponent(id)}/url`)).data;
+  window.location.assign(url);
+};
 
 export const errorMessage = (failure: unknown, fallback: string) => {
   const data = (failure as { response?: { data?: { error?: { message?: string } } } }).response?.data;
