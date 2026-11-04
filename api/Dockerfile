@@ -3,8 +3,9 @@ FROM python:3.12-slim
 ENV PYTHONDONTWRITEBYTECODE=1 PYTHONUNBUFFERED=1 HOME=/home/kweli
 WORKDIR /app
 
-COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+COPY requirements.txt requirements-nodeps.txt ./
+RUN pip install --no-cache-dir -r requirements.txt \
+ && pip install --no-cache-dir --no-deps -r requirements-nodeps.txt
 
 COPY alembic.ini .
 COPY migrations migrations
@@ -13,6 +14,7 @@ COPY paypal paypal
 COPY proof proof
 COPY audit audit
 COPY vault vault
+COPY agent agent
 COPY scripts scripts
 
 RUN useradd --system --create-home kweli

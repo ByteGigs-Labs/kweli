@@ -16,6 +16,7 @@ Kweli handles payment records and identity documents, so a few rules are non-neg
 ```bash
 python3.12 -m venv .venv && source .venv/bin/activate
 pip install -r requirements-dev.txt
+pip install --no-deps -r requirements-nodeps.txt   # PayPal Agent Toolkit, without its vulnerable pins
 pre-commit install
 cp .env.example .env              # fill in the PayPal sandbox credentials
 docker compose up -d postgres
