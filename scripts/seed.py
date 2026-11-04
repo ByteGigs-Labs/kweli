@@ -1,6 +1,8 @@
-"""Create the demo freelancer account. Safe to run more than once.
+"""Create the demo freelancer account, and optionally a demo ledger. Safe to run twice.
 
-Usage: python -m scripts.seed
+Usage:
+  python -m scripts.seed              # demo login only
+  python -m scripts.seed --demo-data  # plus synthetic agreements, invoices and payments
 """
 
 import sys
@@ -30,16 +32,23 @@ def ensure_demo_user(db: Session) -> tuple[User, bool]:
         name=settings.demo_user_name,
         country="KE",
         password_hash=hash_password(password),
+        paypal_merchant_id=settings.paypal_merchant_id or None,
     )
     db.add(user)
     db.commit()
     return user, True
 
 
-def main() -> int:
+def main(argv: list[str] | None = None) -> int:
+    argv = sys.argv[1:] if argv is None else argv
     with Session(get_engine()) as db:
         user, created = ensure_demo_user(db)
         print(f"{'Created' if created else 'Already exists'}: {user.email}")
+        if "--demo-data" in argv:
+            from scripts.demo_data import build_demo_ledger
+
+            added = build_demo_ledger(db, user)
+            print(f"Demo ledger: {added} payments added" if added else "Demo ledger: already there")
     return 0
 
 

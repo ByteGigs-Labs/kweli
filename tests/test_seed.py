@@ -35,7 +35,31 @@ def test_seed_refuses_a_short_password(db, monkeypatch):
 
 
 def test_seed_command_runs_twice(db, demo_password, capsys):
-    assert main() == 0
-    assert main() == 0
+    assert main([]) == 0
+    assert main([]) == 0
     out = capsys.readouterr().out.splitlines()
     assert out == ["Created: amina@demo.kweli.test", "Already exists: amina@demo.kweli.test"]
+
+
+def test_demo_ledger_shows_each_kind_of_gap(db, demo_password, capsys):
+    from api.db.models import Payment, ProofFlag
+
+    assert main(["--demo-data"]) == 0
+    assert main(["--demo-data"]) == 0
+    out = capsys.readouterr().out
+    assert "11 payments added" in out and "already there" in out
+    flags: dict[str, dict[str, str]] = {}
+    for payment_id, rule, status in db.execute(
+        select(Payment.paypal_transaction_id, ProofFlag.rule, ProofFlag.status).join(
+            ProofFlag, ProofFlag.payment_id == Payment.id
+        )
+    ):
+        flags.setdefault(payment_id, {})[rule] = status
+    assert set(flags["SEED-PAY-0005"].values()) == {"pass"}
+    assert flags["SEED-PAY-0006"]["P5"] == "fail"
+    assert flags["SEED-PAY-0007"]["P2"] == "warn"
+    assert flags["SEED-PAY-0008"]["P3"] == "warn"
+    assert flags["SEED-PAY-0009"]["P7"] == "warn"
+    assert flags["SEED-PAY-0010"]["P3"] == "pending"
+    assert flags["SEED-PAY-0011"]["P1"] == "fail"
+    assert flags["SEED-PAY-0011"]["P6"] == "warn"

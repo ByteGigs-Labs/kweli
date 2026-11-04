@@ -5,7 +5,17 @@ from api.config import get_settings
 from api.errors import install_error_handlers
 from api.limits import BodySizeLimit
 from api.logging_config import RequestLog, setup_logging
-from api.routes import agreements, auth, clients, invoices, portal
+from api.routes import (
+    agreements,
+    audit,
+    auth,
+    clients,
+    documents,
+    invoices,
+    ledger,
+    portal,
+    webhooks,
+)
 
 
 def create_app() -> FastAPI:
@@ -22,7 +32,17 @@ def create_app() -> FastAPI:
     app.add_middleware(BodySizeLimit, upload_prefixes=("/v1/documents", "/v1/disputes"))
     app.add_middleware(RequestLog)
     install_error_handlers(app)
-    for module in (auth, clients, agreements, invoices, portal):
+    for module in (
+        auth,
+        clients,
+        agreements,
+        invoices,
+        portal,
+        webhooks,
+        audit,
+        documents,
+        ledger,
+    ):
         app.include_router(module.router)
 
     @app.get("/health")
