@@ -66,7 +66,7 @@ test("selecting a payment explains each check and offers the fix", async () => {
   renderLedger();
   await userEvent.click(await screen.findByText("Kilele Tours"));
   const drawer = await screen.findByRole("dialog");
-  expect(within(drawer).getByText("Paid by Mwangi Holdings, not Kilele Tours.")).toBeInTheDocument();
+  expect(await within(drawer).findByText("Paid by Mwangi Holdings, not Kilele Tours.")).toBeInTheDocument();
   expect(within(drawer).getByText(/confirm in writing/)).toBeInTheDocument();
   expect(within(drawer).getByRole("button", { name: "Upload delivered work" })).toBeInTheDocument();
   await userEvent.keyboard("{Escape}");
