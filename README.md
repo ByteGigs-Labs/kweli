@@ -4,6 +4,10 @@
 
 **Live demo:** `https://kweli-api.onrender.com/health` (API, Day 0) *(PayPal sandbox)* · **License:** MIT
 
+<p align="center">
+  <img src="docs/screenshots/02-proof-ledger.png" alt="Kweli proof ledger: every PayPal payment in a grid, with a pass, warning or fail badge for each of the seven proof checks" width="900">
+</p>
+
 ---
 
 ## 1. The Problem
@@ -38,6 +42,42 @@ Client agreement  →  PayPal invoice  →  Payment  →  Deliverable  →  ✅ 
 
 ### Why it's good for PayPal too
 Kweli doesn't help anyone get around checks. It **helps honest users pass them**. PayPal gets better-documented emerging-market accounts and fewer false-positive reviews, and it keeps serving a fast-growing freelancer market instead of losing it to alternatives.
+
+### Screenshots
+Captured from the seeded demo (`python -m scripts.seed --demo-data`), so every client and payment is synthetic.
+
+<details>
+<summary><b>Open the screenshots</b> (9 images)</summary>
+
+#### Sign in
+<img src="docs/screenshots/01-sign-in.png" alt="Kweli sign-in page" width="800">
+
+#### A payment explained
+Selecting a payment shows each check in plain words. Here the client was Kilele Tours, but someone else paid.
+<img src="docs/screenshots/03-payment-explained.png" alt="Ledger drawer for a Kilele Tours payment, warning that it was paid by Mwangi Holdings, not the client" width="800">
+
+#### Fixed in place
+The delivered work was missing, so the freelancer uploaded it from the drawer. The file is encrypted in the vault and the payment turns fully proven.
+<img src="docs/screenshots/04-fixed-in-place.png" alt="Drawer showing all checks passing after website-copy-final.pdf was uploaded as delivered work" width="800">
+
+#### An agreement from a WhatsApp conversation
+Paste the chat and Kweli fills in the agreement for you to check. It flags what's missing (here, the due date). The model output is stubbed in this capture; the form and checks are the real UI.
+<img src="docs/screenshots/05-agreement-from-conversation.png" alt="New agreement form filled in from a pasted client conversation, with the due date flagged as missing" width="800">
+
+#### The proof chain for one agreement
+<img src="docs/screenshots/06-agreement-proof-chain.png" alt="Agreement page for Logo design showing agreement, invoice, payment and deliverable all on file" width="800">
+
+#### The assistant prepares, you approve
+The assistant can only propose. The recipient and amount on the card come from the agreement in the database, not from the model. The reply text is stubbed in this capture; the proposal and its approval card are real.
+<img src="docs/screenshots/07-assistant-approval.png" alt="Assistant chat with an approval card to create and send a USD 350.00 PayPal invoice to Nairobi Eats" width="800">
+
+#### The client accepts on their phone
+<img src="docs/screenshots/08-client-accepts-on-phone.png" alt="Client acceptance page on a phone for the Packaging labels agreement, with terms and an accept checkbox" width="320">
+
+#### The ledger on a phone
+<img src="docs/screenshots/09-ledger-on-phone.png" alt="Proof ledger summary on a phone" width="320">
+
+</details>
 
 ## 3. Glass Box Agent Design
 
