@@ -39,6 +39,8 @@ class Settings(BaseSettings):
     paypal_merchant_id: str = ""
 
     anthropic_api_key: SecretStr | None = None
+    agent_max_steps: int = 6
+    agent_messages_per_minute: int = 20
     llm_model: str = "claude-sonnet-5-5"
 
     vault_master_key: SecretStr | None = None

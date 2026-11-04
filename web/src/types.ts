@@ -130,3 +130,33 @@ export interface StoredDocument {
   size: number;
   sha256: string;
 }
+
+export interface AgentStep {
+  tool: string;
+  label: string;
+  ok: boolean;
+}
+
+export type AgentActionStatus = "proposed" | "approved" | "rejected" | "executed" | "failed";
+
+export interface AgentAction {
+  id: string;
+  kind: string;
+  title: string;
+  details: { label: string; value: string }[];
+  status: AgentActionStatus;
+  expires_at: string;
+  token: string | null;
+  result: { message?: string; link?: string | null } | null;
+}
+
+export interface AgentReply {
+  reply: string;
+  steps: AgentStep[];
+  actions: AgentAction[];
+}
+
+export interface ChatMessage {
+  role: "user" | "assistant";
+  content: string;
+}
