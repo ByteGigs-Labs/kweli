@@ -9,6 +9,7 @@ os.environ["CORS_ORIGINS"] = '["http://localhost:5173"]'
 os.environ["COOKIE_SECURE"] = "false"
 os.environ["PAYPAL_ENV"] = "sandbox"
 os.environ["HMAC_KEY"] = "test-hmac-key"
+os.environ["VAULT_MASTER_KEY"] = "test-vault-master-key"
 os.environ["PUBLIC_WEB_URL"] = "https://kweli.test"
 
 import pytest  # noqa: E402
@@ -24,9 +25,9 @@ from api.security import hash_password  # noqa: E402
 
 PASSWORD = "correct-horse-battery"
 TABLES = (
-    "audit_log, subscriptions, webhook_events, agent_actions, packs, disputes, proof_flags, "
-    "payment_links, payments, invoices, agreements, documents, clients, login_attempts, "
-    "sessions, users"
+    "document_blobs, audit_log, subscriptions, webhook_events, agent_actions, packs, disputes, "
+    "proof_flags, payment_links, payments, invoices, agreements, documents, clients, "
+    "login_attempts, sessions, users"
 )
 
 
