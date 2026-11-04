@@ -9,6 +9,7 @@ from sqlalchemy.orm import Session
 from api.config import get_settings
 from api.db.models import Agreement, Client
 from api.security import token_hash
+from audit.log import record
 from paypal.money import to_paypal_value
 
 
@@ -60,6 +61,12 @@ def accept(db: Session, agreement: Agreement, ip: str, user_agent: str) -> None:
     agreement.accepted_at = datetime.now(UTC)
     agreement.accepted_ip_hash = pseudonymise_ip(ip)
     agreement.accepted_user_agent = user_agent[:300]
+    record(
+        db,
+        agreement.user_id,
+        "agreement.accepted",
+        {"agreement_id": str(agreement.id), "ip_hash": agreement.accepted_ip_hash},
+    )
     db.commit()
 
 

@@ -11,6 +11,7 @@ from api.deps import get_paypal
 from api.listing import ListParams, paginate
 from api.schemas import InvoiceIn, InvoiceOut
 from api.security import Principal, current_principal
+from audit.log import record
 from paypal.auth import PayPalAuthError
 from paypal.client import PayPalClient
 from paypal.errors import PayPalError
@@ -125,6 +126,18 @@ def create_invoice(
         raise _paypal_failure(error) from error
     invoice.number = number
     invoice.paypal_invoice_id = draft["id"]
+    record(
+        db,
+        principal.user_id,
+        "invoice.drafted",
+        {
+            "invoice_id": str(invoice.id),
+            "agreement_id": str(agreement.id),
+            "paypal_invoice_id": invoice.paypal_invoice_id,
+            "amount_minor": invoice.amount_minor,
+            "currency": invoice.currency,
+        },
+    )
     db.commit()
     return InvoiceOut.model_validate(invoice)
 
@@ -151,5 +164,6 @@ def send_invoice(
     invoice.status = "sent"
     invoice.sent_at = datetime.now(UTC)
     invoice.payer_view_url = payer_view_url(sent)
+    record(db, principal.user_id, "invoice.sent", {"invoice_id": str(invoice.id)})
     db.commit()
     return InvoiceOut.model_validate(invoice)
