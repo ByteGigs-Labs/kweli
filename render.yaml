@@ -32,6 +32,8 @@ services:
       - key: ANTHROPIC_API_KEY
         sync: false
       - key: VAULT_MASTER_KEY
+        generateValue: true
+      - key: PAYPAL_MERCHANT_ID
         sync: false
       - key: CORS_ORIGINS
         value: '["https://kweli-web.onrender.com"]'

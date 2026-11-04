@@ -39,7 +39,7 @@ jobs:
       - run: pip install -r requirements-dev.txt
       - run: ruff check .
       - run: ruff format --check .
-      - run: pytest -q --cov=api --cov=paypal --cov=scripts --cov-fail-under=85
+      - run: pytest -q --cov=api --cov=paypal --cov=proof --cov=audit --cov=vault --cov=scripts --cov-fail-under=85
       - run: pip-audit -r requirements.txt
 
   web:
@@ -90,3 +90,5 @@ jobs:
       - run: cp .env.example .env
       - run: docker compose config --quiet
       - run: docker compose build api
+      - name: App imports inside the built image
+        run: docker compose run --rm --no-deps api python -c "import api.main, scripts.seed, scripts.demo_data, scripts.refresh_payers"
