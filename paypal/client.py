@@ -59,6 +59,7 @@ class PayPalClient:
         path: str,
         *,
         json: dict | None = None,
+        raw_json: bytes | None = None,
         params: dict | None = None,
         request_id: str | None = None,
         prefer_representation: bool = False,
@@ -78,11 +79,14 @@ class PayPalClient:
                 headers["PayPal-Request-Id"] = request_id
             if prefer_representation:
                 headers["Prefer"] = "return=representation"
+            if raw_json is not None:
+                headers["Content-Type"] = "application/json"
             try:
                 response = self.http.request(
                     method,
                     f"{self.settings.paypal_base_url}{path}",
-                    json=json,
+                    json=json if raw_json is None else None,
+                    content=raw_json,
                     params=params,
                     headers=headers,
                 )
