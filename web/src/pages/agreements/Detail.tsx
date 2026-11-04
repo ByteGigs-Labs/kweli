@@ -2,22 +2,31 @@ import { useState } from "react";
 import { Link, useParams } from "react-router";
 import { ProofChain, type ChainLink } from "../../components/ProofChain";
 import { StatusChip } from "../../components/StatusChip";
+import { UploadDeliverable } from "../../components/UploadDeliverable";
 import {
   createInvoice,
   errorMessage,
   getAgreement,
   getInvoice,
+  listDocuments,
+  openDocument,
   sendAgreement,
   sendInvoice,
 } from "../../lib/api";
 import { shortDate } from "../../lib/dates";
 import { formatMoney } from "../../lib/money";
 import { useAsync } from "../../lib/useAsync";
-import type { AcceptLink, Agreement, Invoice } from "../../types";
+import type { AcceptLink, Agreement, Invoice, StoredDocument } from "../../types";
 
-function chainFor(agreement: Agreement, invoice: Invoice | undefined): ChainLink[] {
+function chainFor(
+  agreement: Agreement,
+  invoice: Invoice | undefined,
+  documents: StoredDocument[] | undefined,
+): ChainLink[] {
   const accepted = agreement.status === "accepted";
   const sent = invoice && invoice.status !== "draft";
+  const paid = invoice && ["paid", "partially_paid"].includes(invoice.status);
+  const delivered = documents?.find((document) => document.kind === "deliverable");
   return [
     {
       name: "Agreement",
@@ -29,8 +38,16 @@ function chainFor(agreement: Agreement, invoice: Invoice | undefined): ChainLink
       detail: sent ? `Sent ${shortDate(invoice.sent_at)}` : invoice ? "Draft, not sent" : "Not created",
       state: sent ? "proven" : "missing",
     },
-    { name: "Payment", detail: "Not paid yet", state: "missing" },
-    { name: "Deliverable", detail: "Not uploaded", state: "missing" },
+    {
+      name: "Payment",
+      detail: paid ? (invoice.status === "paid" ? "Paid" : "Part paid") : "Not paid yet",
+      state: paid ? "proven" : "missing",
+    },
+    {
+      name: "Deliverable",
+      detail: delivered ? "On file" : "Not uploaded",
+      state: delivered ? "proven" : "missing",
+    },
   ];
 }
 
@@ -206,6 +223,7 @@ export function AgreementDetailPage() {
     () => (invoiceId ? getInvoice(invoiceId) : Promise.resolve(undefined)),
     [invoiceId],
   );
+  const documents = useAsync(() => listDocuments(id), [id]);
 
   if (agreement.error) {
     return (
@@ -236,7 +254,7 @@ export function AgreementDetailPage() {
       <div className="detail-layout">
         <div className="stack">
           <section className="panel" aria-label="Proof for this work">
-            <ProofChain links={chainFor(data, invoice.data)} />
+            <ProofChain links={chainFor(data, invoice.data, documents.data)} />
           </section>
           <section className="panel" aria-labelledby="terms-title">
             <h2 id="terms-title">What the client accepts</h2>
@@ -254,6 +272,26 @@ export function AgreementDetailPage() {
           </section>
         </div>
         <div className="stack">
+          <section className="panel" aria-labelledby="work-title">
+            <h2 id="work-title">Delivered work</h2>
+            {documents.data && documents.data.length > 0 ? (
+              <ul className="file-list" style={{ marginBottom: 16 }}>
+                {documents.data.map((document) => (
+                  <li key={document.id}>
+                    <button type="button" onClick={() => openDocument(document.id)}>
+                      {document.filename}
+                    </button>{" "}
+                    <span className="muted">({Math.max(1, Math.round(document.size / 1024))} KB)</span>
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p className="muted">
+                Upload the final files when you deliver. They prove the payment was for real work.
+              </p>
+            )}
+            <UploadDeliverable agreementId={data.id} onUploaded={() => documents.reload()} />
+          </section>
           {data.status === "accepted" ? (
             <InvoicePanel
               agreement={data}

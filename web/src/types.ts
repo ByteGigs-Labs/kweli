@@ -5,7 +5,7 @@ export interface Identity {
   plan: "free" | "pro";
 }
 
-export type ProofStatus = "pass" | "warn" | "fail";
+export type ProofStatus = "pass" | "warn" | "fail" | "pending";
 export type RuleId = "P1" | "P2" | "P3" | "P4" | "P5" | "P6" | "P7";
 
 export interface LedgerRow {
@@ -103,4 +103,30 @@ export interface PortalAgreement {
   terms: string[];
   status: AgreementStatus;
   accepted_at: string | null;
+}
+
+export interface LedgerFlag {
+  rule: RuleId;
+  status: ProofStatus;
+  explanation: string;
+  fix: string | null;
+}
+
+export interface LedgerDetail extends LedgerRow {
+  payer: string | null;
+  payment_type: string;
+  flags: LedgerFlag[];
+  chain: { name: string; proven: boolean; detail: string }[];
+  agreement_id: string | null;
+  invoice_number: string | null;
+}
+
+export interface StoredDocument {
+  id: string;
+  agreement_id: string | null;
+  kind: string;
+  filename: string;
+  mime: string;
+  size: number;
+  sha256: string;
 }

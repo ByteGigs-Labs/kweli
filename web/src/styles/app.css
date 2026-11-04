@@ -217,8 +217,13 @@ a {
   width: 26px;
   height: 26px;
   border-radius: 50%;
-  font-weight: 700;
-  font-size: 0.85rem;
+  vertical-align: middle;
+}
+
+.grid-frame .ag-cell:has(> .badge),
+.grid-frame .ag-cell-wrapper:has(.badge) {
+  display: flex;
+  align-items: center;
 }
 
 .badge-pass {
@@ -420,4 +425,117 @@ a {
   .detail-layout {
     grid-template-columns: minmax(0, 1fr);
   }
+}
+
+.badge-pending {
+  background: color-mix(in srgb, var(--ink) 8%, transparent);
+  color: var(--ink-soft);
+}
+
+.drawer-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 20;
+  background: color-mix(in srgb, var(--ink) 35%, transparent);
+}
+
+.drawer {
+  position: fixed;
+  inset: 0 0 0 auto;
+  z-index: 21;
+  width: min(560px, 100%);
+  overflow-y: auto;
+  padding: calc(var(--space) * 3);
+  background: var(--surface);
+  border-left: 1px solid var(--line);
+  display: grid;
+  align-content: start;
+  gap: calc(var(--space) * 2.5);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .drawer {
+    animation: drawer-in 220ms cubic-bezier(0.2, 0.7, 0.2, 1);
+  }
+}
+
+@keyframes drawer-in {
+  from {
+    transform: translateX(32px);
+    opacity: 0;
+  }
+}
+
+.drawer-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: start;
+  gap: var(--space);
+}
+
+.drawer-head h2 {
+  font-size: var(--step-2);
+}
+
+.rule-list {
+  display: grid;
+  gap: calc(var(--space) * 1.5);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.rule-item {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: calc(var(--space) * 1.5);
+  align-items: start;
+}
+
+.rule-item p {
+  margin: 0;
+}
+
+.rule-fix {
+  color: var(--ink-soft);
+  font-size: var(--step--1);
+  margin-top: 2px;
+}
+
+.ledger-summary {
+  display: flex;
+  flex-wrap: wrap;
+  gap: calc(var(--space) * 1.5);
+  margin: 0 0 calc(var(--space) * 2);
+  padding: 0;
+  list-style: none;
+}
+
+.ledger-summary li {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space);
+  color: var(--ink-soft);
+}
+
+.ledger-summary strong {
+  color: var(--ink);
+}
+
+.file-list {
+  display: grid;
+  gap: var(--space);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.file-list button {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--focus);
+  font: inherit;
+  text-decoration: underline;
+  cursor: pointer;
 }
