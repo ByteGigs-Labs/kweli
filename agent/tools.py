@@ -18,10 +18,11 @@ from agent.toolkit import ToolkitClientAdapter, toolkit_specs
 from api.config import get_settings
 from api.db.models import Agreement, Client, Invoice, Payment, ProofFlag, User
 from api.services.invoicing import ServiceError
+from api.services.ledger import proofs_for_user
 from paypal.client import PayPalClient
 from paypal.errors import PayPalError
 from paypal.money import to_paypal_value
-from proof.rules import SEVERITY
+from proof.readiness import assess
 
 UUID_SCHEMA = {"type": "string", "description": "An id returned by another tool"}
 
@@ -232,45 +233,31 @@ class Toolbox:
         }
 
     def _ledger_overview(self) -> dict:
-        payments = self.db.scalars(
-            select(Payment)
-            .where(Payment.user_id == self.user_id)
-            .order_by(Payment.received_at.desc())
-        ).all()
-        flags: dict[UUID, list[ProofFlag]] = {}
-        for flag in self.db.scalars(
-            select(ProofFlag).where(ProofFlag.payment_id.in_([p.id for p in payments]))
-        ):
-            flags.setdefault(flag.payment_id, []).append(flag)
-        counts = {"pass": 0, "warn": 0, "fail": 0, "pending": 0}
-        attention = []
-        for payment in payments:
-            own = flags.get(payment.id, [])
-            overall = max((f.status for f in own), key=SEVERITY.__getitem__, default="pending")
-            counts[overall] += 1
-            problems = [f for f in own if f.status in ("fail", "warn")]
-            if problems:
-                attention.append(
-                    {
-                        "payment_id": str(payment.id),
-                        "received": payment.received_at.date().isoformat(),
-                        "amount": f"{payment.currency} "
-                        f"{to_paypal_value(payment.amount_minor, payment.currency)}",
-                        "status": overall,
-                        "problems": [
-                            {"check": f.rule, "explanation": f.explanation, "fix": f.fix}
-                            for f in sorted(problems, key=lambda f: f.rule)
-                        ],
-                    }
-                )
-        attention.sort(key=lambda item: SEVERITY[item["status"]], reverse=True)
+        result = assess(proofs_for_user(self.db, self.user_id))
         return {
-            "payments": len(payments),
-            "fully_proven": counts["pass"],
-            "need_attention": counts["warn"],
-            "missing_proof": counts["fail"],
-            "being_checked": counts["pending"],
-            "most_urgent": attention[:5],
+            "readiness_score": result.score,
+            "readiness": result.band,
+            "payments": result.payments,
+            "fully_proven": result.statuses["pass"],
+            "need_attention": result.statuses["warn"],
+            "missing_proof": result.statuses["fail"],
+            "being_checked": result.statuses["pending"],
+            "most_urgent": [
+                {
+                    "payment_id": str(item.payment_id),
+                    "client": item.client,
+                    "received": item.received_at.date().isoformat(),
+                    "amount": f"{item.currency} "
+                    f"{to_paypal_value(item.amount_minor, item.currency)}",
+                    "status": item.status,
+                    "score_points_if_fixed": item.points,
+                    "problems": [
+                        {"check": step.rule, "explanation": step.problem, "fix": step.fix}
+                        for step in item.steps
+                    ],
+                }
+                for item in result.fix_next[:5]
+            ],
         }
 
     def _explain_payment(self, arguments: dict) -> dict:

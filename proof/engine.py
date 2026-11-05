@@ -1,5 +1,6 @@
 """Gather the facts for a payment from the database, run the rules, store the results."""
 
+from dataclasses import dataclass
 from datetime import timedelta
 from uuid import UUID
 
@@ -21,9 +22,25 @@ from proof.rules import (
 HISTORY_WINDOW = timedelta(days=90)
 
 
-def _links(
-    db: Session, payment: Payment
-) -> tuple[Invoice | None, Agreement | None, Document | None]:
+@dataclass(frozen=True)
+class Linked:
+    invoice: Invoice | None
+    agreement: Agreement | None
+    deliverable: Document | None
+    payer_confirmation: Document | None
+
+
+def latest_document(db: Session, agreement_id: UUID, kind: str) -> Document | None:
+    return db.scalar(
+        select(Document)
+        .where(Document.agreement_id == agreement_id, Document.kind == kind)
+        .order_by(Document.created_at.desc())
+        .limit(1)
+    )
+
+
+def _links(db: Session, payment: Payment) -> Linked:
+    """The invoice decides the agreement when there is one; otherwise a link made by hand."""
     invoice = None
     if payment.paypal_invoice_id:
         invoice = db.scalar(
@@ -32,22 +49,27 @@ def _links(
                 Invoice.paypal_invoice_id == payment.paypal_invoice_id,
             )
         )
-    agreement = (
-        db.get(Agreement, invoice.agreement_id) if invoice and invoice.agreement_id else None
-    )
-    deliverable = None
-    if agreement:
-        deliverable = db.scalar(
-            select(Document)
-            .where(Document.agreement_id == agreement.id, Document.kind == "deliverable")
-            .order_by(Document.created_at.desc())
-            .limit(1)
+    agreement_id = invoice.agreement_id if invoice else payment.agreement_id
+    agreement = None
+    if agreement_id:
+        agreement = db.scalar(
+            select(Agreement).where(
+                Agreement.id == agreement_id, Agreement.user_id == payment.user_id
+            )
         )
-    return invoice, agreement, deliverable
+    if not agreement:
+        return Linked(invoice, None, None, None)
+    return Linked(
+        invoice,
+        agreement,
+        latest_document(db, agreement.id, "deliverable"),
+        latest_document(db, agreement.id, "payer_confirmation"),
+    )
 
 
 def facts_for(db: Session, payment: Payment) -> tuple[Facts, PaymentLink]:
-    invoice, agreement, deliverable = _links(db, payment)
+    linked = _links(db, payment)
+    invoice, agreement, deliverable = linked.invoice, linked.agreement, linked.deliverable
     client = db.get(Client, agreement.client_id) if agreement else None
     history = db.scalars(
         select(Payment.amount_minor).where(
@@ -77,6 +99,9 @@ def facts_for(db: Session, payment: Payment) -> tuple[Facts, PaymentLink]:
         if agreement and client
         else None,
         deliverable_name=deliverable.filename if deliverable else None,
+        payer_confirmation_name=linked.payer_confirmation.filename
+        if linked.payer_confirmation
+        else None,
         recent_amounts_minor=list(history),
     )
     link = PaymentLink(
@@ -123,6 +148,8 @@ def reevaluate_for_agreement(db: Session, agreement_id: UUID) -> int:
         .join(PaymentLink, PaymentLink.payment_id == Payment.id)
         .where(PaymentLink.agreement_id == agreement_id)
     ).all()
+    manual = db.scalars(select(Payment).where(Payment.agreement_id == agreement_id)).all()
+    payments = list({payment.id: payment for payment in [*payments, *manual]}.values())
     for payment in payments:
         evaluate_payment(db, payment)
     return len(payments)

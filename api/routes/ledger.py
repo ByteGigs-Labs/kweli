@@ -6,10 +6,13 @@ from pydantic import BaseModel
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
-from api.db.models import Agreement, Client, Document, Invoice, Payment, PaymentLink, ProofFlag
+from api.db.models import Agreement, Document, Invoice, Payment
 from api.db.session import get_db
 from api.listing import ListParams, paginate
 from api.security import Principal, current_principal
+from api.services.ledger import LedgerContext, load_context
+from audit.log import record
+from proof.engine import evaluate_payment, latest_document
 from proof.rules import SEVERITY
 
 router = APIRouter(prefix="/v1/ledger", tags=["ledger"])
@@ -46,42 +49,24 @@ class LedgerDetail(LedgerRow):
     chain: list[ChainStep]
     agreement_id: UUID | None
     invoice_number: str | None
+    linked_by: str | None
+    payer_confirmation: str | None
+
+
+class LinkRequest(BaseModel):
+    agreement_id: UUID | None
 
 
 def _overall(statuses: list[str]) -> str:
     return max(statuses, key=SEVERITY.__getitem__) if statuses else "pending"
 
 
-def _context(db: Session, payments: list[Payment]):
-    ids = [payment.id for payment in payments]
-    flags: dict[UUID, list[ProofFlag]] = {payment_id: [] for payment_id in ids}
-    for flag in db.scalars(
-        select(ProofFlag).where(ProofFlag.payment_id.in_(ids)).order_by(ProofFlag.rule)
-    ):
-        flags[flag.payment_id].append(flag)
-    links = {
-        link.payment_id: link
-        for link in db.scalars(select(PaymentLink).where(PaymentLink.payment_id.in_(ids)))
-    }
-    agreement_ids = [link.agreement_id for link in links.values() if link.agreement_id]
-    clients = dict(
-        db.execute(
-            select(Agreement.id, Client.name)
-            .join(Client, Client.id == Agreement.client_id)
-            .where(Agreement.id.in_(agreement_ids))
-        ).all()
-    )
-    return flags, links, clients
-
-
-def _row(payment: Payment, flags, links, clients) -> LedgerRow:
-    link = links.get(payment.id)
-    client = clients.get(link.agreement_id) if link and link.agreement_id else None
-    own = flags.get(payment.id, [])
+def _row(payment: Payment, context: LedgerContext) -> LedgerRow:
+    own = context.flags.get(payment.id, [])
     return LedgerRow(
         id=payment.id,
         received_at=payment.received_at,
-        client=client or payment.payer_name or payment.payer_email or "Unknown payer",
+        client=context.client_for(payment),
         amount_minor=payment.amount_minor,
         currency=payment.currency,
         rules={flag.rule: flag.status for flag in own},
@@ -98,8 +83,8 @@ def list_ledger(
 ) -> list[LedgerRow]:
     query = select(Payment).where(Payment.user_id == principal.user_id)
     payments = paginate(db, query, params, SORTABLE, "received_at", response)
-    flags, links, clients = _context(db, payments)
-    return [_row(payment, flags, links, clients) for payment in payments]
+    context = load_context(db, payments)
+    return [_row(payment, context) for payment in payments]
 
 
 @router.get("/{payment_id}")
@@ -113,9 +98,9 @@ def ledger_detail(
     )
     if not payment:
         raise HTTPException(status.HTTP_404_NOT_FOUND, "Payment not found")
-    flags, links, clients = _context(db, [payment])
-    row = _row(payment, flags, links, clients)
-    link = links.get(payment.id)
+    context = load_context(db, [payment])
+    row = _row(payment, context)
+    link = context.links.get(payment.id)
     invoice = db.get(Invoice, link.invoice_id) if link and link.invoice_id else None
     agreement = db.get(Agreement, link.agreement_id) if link and link.agreement_id else None
     deliverable = (
@@ -123,6 +108,7 @@ def ledger_detail(
         if link and link.deliverable_document_id
         else None
     )
+    confirmation = latest_document(db, agreement.id, "payer_confirmation") if agreement else None
     accepted = bool(agreement and agreement.accepted_at)
     chain = [
         ChainStep(
@@ -148,8 +134,59 @@ def ledger_detail(
         **row.model_dump(),
         payer=payment.payer_name or payment.payer_email,
         payment_type=payment.payment_type,
-        flags=[Flag.model_validate(flag, from_attributes=True) for flag in flags[payment.id]],
+        flags=[
+            Flag.model_validate(flag, from_attributes=True) for flag in context.flags[payment.id]
+        ],
         chain=chain,
         agreement_id=agreement.id if agreement else None,
         invoice_number=invoice.number if invoice else None,
+        linked_by=("invoice" if invoice and agreement else "hand") if agreement else None,
+        payer_confirmation=confirmation.filename if confirmation else None,
     )
+
+
+@router.post("/{payment_id}/agreement")
+def link_agreement(
+    payment_id: UUID,
+    body: LinkRequest,
+    principal: Principal = Depends(current_principal),
+    db: Session = Depends(get_db),
+) -> LedgerDetail:
+    """Link a payment that didn't come through a Kweli invoice to its agreement (or unlink)."""
+    payment = db.scalar(
+        select(Payment)
+        .where(Payment.id == payment_id, Payment.user_id == principal.user_id)
+        .with_for_update()
+    )
+    if not payment:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "Payment not found")
+    if payment.paypal_invoice_id and db.scalar(
+        select(Invoice.id).where(
+            Invoice.user_id == principal.user_id,
+            Invoice.paypal_invoice_id == payment.paypal_invoice_id,
+        )
+    ):
+        raise HTTPException(
+            status.HTTP_409_CONFLICT, "This payment's invoice already links it to an agreement."
+        )
+    if body.agreement_id and not db.scalar(
+        select(Agreement.id).where(
+            Agreement.id == body.agreement_id, Agreement.user_id == principal.user_id
+        )
+    ):
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "Agreement not found")
+    previous = payment.agreement_id
+    payment.agreement_id = body.agreement_id
+    record(
+        db,
+        principal.user_id,
+        "payment.linked" if body.agreement_id else "payment.unlinked",
+        {
+            "payment_id": str(payment.id),
+            "agreement_id": str(body.agreement_id) if body.agreement_id else None,
+            "previous_agreement_id": str(previous) if previous else None,
+        },
+    )
+    evaluate_payment(db, payment)
+    db.commit()
+    return ledger_detail(payment_id, principal, db)

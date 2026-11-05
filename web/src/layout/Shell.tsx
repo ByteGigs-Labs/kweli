@@ -5,6 +5,7 @@ import type { Identity } from "../types";
 import "../styles/shell.css";
 
 const NAV: { to: string; label: string; ready: boolean }[] = [
+  { to: "/overview", label: "Overview", ready: true },
   { to: "/ledger", label: "Proof ledger", ready: true },
   { to: "/assistant", label: "Assistant", ready: true },
   { to: "/agreements", label: "Agreements", ready: true },

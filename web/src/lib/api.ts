@@ -10,6 +10,7 @@ import type {
   LedgerDetail,
   LedgerRow,
   PortalAgreement,
+  Readiness,
   StoredDocument,
 } from "../types";
 import { http } from "./http";
@@ -60,13 +61,27 @@ export const getLedgerEntry = async (id: string) =>
 export const listDocuments = async (agreementId: string) =>
   (await http.get<StoredDocument[]>("/v1/documents", { params: { agreement_id: agreementId } })).data;
 
-export const uploadDeliverable = async (agreementId: string, file: File) => {
+export type ProofDocumentKind = "deliverable" | "payer_confirmation";
+
+export const uploadProof = async (agreementId: string, file: File, kind: ProofDocumentKind) => {
   const body = new FormData();
   body.append("file", file);
-  body.append("kind", "deliverable");
+  body.append("kind", kind);
   body.append("agreement_id", agreementId);
   return (await http.post<StoredDocument>("/v1/documents", body)).data;
 };
+
+export const uploadDeliverable = (agreementId: string, file: File) =>
+  uploadProof(agreementId, file, "deliverable");
+
+export const getReadiness = async () => (await http.get<Readiness>("/v1/readiness")).data;
+
+export const linkPaymentAgreement = async (paymentId: string, agreementId: string | null) =>
+  (
+    await http.post<LedgerDetail>(`/v1/ledger/${encodeURIComponent(paymentId)}/agreement`, {
+      agreement_id: agreementId,
+    })
+  ).data;
 
 export const openDocument = async (id: string) => {
   const { url } = (await http.get<{ url: string }>(`/v1/documents/${encodeURIComponent(id)}/url`)).data;

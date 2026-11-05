@@ -119,6 +119,50 @@ export interface LedgerDetail extends LedgerRow {
   chain: { name: string; proven: boolean; detail: string }[];
   agreement_id: string | null;
   invoice_number: string | null;
+  linked_by: "invoice" | "hand" | null;
+  payer_confirmation: string | null;
+}
+
+export type ReadinessBand = "ready" | "nearly" | "at_risk" | "no_payments";
+
+export interface FixStep {
+  rule: RuleId;
+  status: ProofStatus;
+  problem: string;
+  fix: string;
+}
+
+export interface FixItem {
+  payment_id: string;
+  agreement_id: string | null;
+  client: string;
+  amount_minor: number;
+  currency: string;
+  received_at: string;
+  status: ProofStatus;
+  points: number;
+  steps: FixStep[];
+}
+
+export interface ClientSummary {
+  client: string;
+  payments: number;
+  totals: { currency: string; amount_minor: number }[];
+  statuses: Record<ProofStatus, number>;
+  score: number | null;
+}
+
+export interface Readiness {
+  score: number | null;
+  band: ReadinessBand;
+  thresholds: { ready: number; nearly: number };
+  payments: number;
+  statuses: Record<ProofStatus, number>;
+  checks: Record<ProofStatus, number>;
+  large_payments: number;
+  fix_total: number;
+  fix_next: FixItem[];
+  clients: ClientSummary[];
 }
 
 export interface StoredDocument {

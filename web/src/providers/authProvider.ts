@@ -6,7 +6,7 @@ export const authProvider: AuthProvider = {
   login: async ({ email, password }) => {
     try {
       await http.post("/v1/auth/login", { email, password });
-      return { success: true, redirectTo: "/ledger" };
+      return { success: true, redirectTo: "/overview" };
     } catch (failure) {
       const status = statusOf(failure);
       return {

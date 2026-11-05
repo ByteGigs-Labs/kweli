@@ -4,6 +4,7 @@ import { getLedgerEntry } from "../lib/api";
 import { formatMoney } from "../lib/money";
 import { useAsync } from "../lib/useAsync";
 import { ProofBadge } from "./ProofBadge";
+import { LinkAgreement } from "./LinkAgreement";
 import { ProofChain } from "./ProofChain";
 import { UploadDeliverable } from "./UploadDeliverable";
 
@@ -36,7 +37,13 @@ export function LedgerDrawer({
     return () => window.removeEventListener("keydown", onKey);
   }, [onClose]);
 
-  const needsWork = data?.flags.some((flag) => flag.rule === "P5" && flag.status === "fail");
+  const status = (rule: string) => data?.flags.find((flag) => flag.rule === rule)?.status;
+  const needsWork = status("P5") === "fail";
+  const needsPayerConfirmation = status("P3") === "warn";
+  const changed = () => {
+    reload();
+    onChanged();
+  };
 
   return (
     <>
@@ -72,6 +79,14 @@ export function LedgerDrawer({
                 state: step.proven ? "proven" : "missing",
               }))}
             />
+            {!data.invoice_number && (
+              <LinkAgreement
+                key={data.agreement_id ?? "none"}
+                paymentId={data.id}
+                current={data.linked_by === "hand" ? data.agreement_id : null}
+                onLinked={changed}
+              />
+            )}
             <ul className="rule-list" aria-label="Proof checks">
               {data.flags.map((flag) => (
                 <li className="rule-item" key={flag.rule}>
@@ -86,12 +101,13 @@ export function LedgerDrawer({
               ))}
             </ul>
             {data.agreement_id && needsWork && (
+              <UploadDeliverable agreementId={data.agreement_id} onUploaded={changed} />
+            )}
+            {data.agreement_id && needsPayerConfirmation && (
               <UploadDeliverable
                 agreementId={data.agreement_id}
-                onUploaded={() => {
-                  reload();
-                  onChanged();
-                }}
+                kind="payer_confirmation"
+                onUploaded={changed}
               />
             )}
             {data.agreement_id && (

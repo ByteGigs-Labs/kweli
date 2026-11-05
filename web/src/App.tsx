@@ -7,6 +7,9 @@ import { LoginPage } from "./pages/Login";
 import { authProvider } from "./providers/authProvider";
 import { dataProvider } from "./providers/dataProvider";
 
+const OverviewPage = lazy(() =>
+  import("./pages/Overview").then((m) => ({ default: m.OverviewPage })),
+);
 const LedgerPage = lazy(() => import("./pages/Ledger").then((m) => ({ default: m.LedgerPage })));
 const AgreementsPage = lazy(() =>
   import("./pages/agreements/List").then((m) => ({ default: m.AgreementsPage })),
@@ -31,6 +34,7 @@ export default function App() {
         authProvider={authProvider}
         routerProvider={routerProvider}
         resources={[
+          { name: "overview", list: "/overview", meta: { label: "Overview" } },
           { name: "ledger", list: "/ledger", meta: { label: "Proof ledger" } },
           { name: "agreements", list: "/agreements", show: "/agreements/:id", create: "/agreements/new" },
           { name: "invoices", list: "/invoices" },
@@ -48,7 +52,8 @@ export default function App() {
               </Authenticated>
             }
           >
-            <Route index element={<Navigate to="/ledger" replace />} />
+            <Route index element={<Navigate to="/overview" replace />} />
+            <Route path="/overview" element={<OverviewPage />} />
             <Route path="/ledger" element={<LedgerPage />} />
             <Route path="/agreements" element={<AgreementsPage />} />
             <Route path="/agreements/new" element={<NewAgreementPage />} />
@@ -59,7 +64,7 @@ export default function App() {
           <Route
             element={
               <Authenticated key="guest" fallback={<Outlet />} loading={<Outlet />}>
-                <NavigateToResource resource="ledger" />
+                <NavigateToResource resource="overview" />
               </Authenticated>
             }
           >

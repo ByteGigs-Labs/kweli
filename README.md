@@ -34,8 +34,8 @@ Client agreement  →  PayPal invoice  →  Payment  →  Deliverable  →  ✅ 
 |---|---|---|
 | **1. Engagement agent** | Paste a WhatsApp/email thread → the agent drafts a plain-language engagement agreement → the client accepts it through a link, and the timestamp is recorded | — |
 | **2. Assistant** | "Invoice Acme for the logo, due in 7 days" → the assistant finds the agreement and prepares the invoice → you approve the card → Kweli creates and sends a real PayPal invoice tied to the agreement | Invoicing v2 (draft, send, remind) · Agent Toolkit read tools: `get_invoice`, `list_invoices`, `list_transactions` |
-| **3. Proof ledger** | Every incoming payment is matched to its invoice, agreement and deliverable. Gaps are flagged with a plain reason and a fix | Webhooks, Invoicing v2, Transaction Search |
-| **4. Readiness score** | The share of your incoming volume that is fully documented, with what's missing and how to fix it | — |
+| **3. Proof ledger** | Every incoming payment is matched to its invoice, agreement and deliverable. Gaps are flagged with a plain reason and a fix you can make in place: upload the work, upload the client's confirmation of a third-party payment, or link a payment that didn't come through an invoice to its agreement. Search, filter by status or client, see readiness by client, export to CSV | Webhooks, Invoicing v2, Transaction Search |
+| **4. Readiness score** | One score out of 100 for how ready you are for a PayPal review, and a "fix next" list in priority order with the points each fix wins ([how it's scored](docs/readiness.md)) | — |
 | **5. Compliance Pack** | When an information request arrives, one click builds a PDF + ZIP: a cover letter, a payment-to-document mapping table, contracts, invoices and deliverables, **each cited** | Transaction Search |
 | **6. Dispute defender** | A client opens a dispute → the agent assembles evidence from the vault, drafts the response *(you approve)* and submits it | Disputes API: `get_dispute`, `provide-evidence`, `send-message`, `make-offer` |
 | **7. Kweli Pro billing** | Subscriptions for Kweli itself, paid through PayPal | Subscriptions API |
@@ -141,7 +141,7 @@ Kweli's AI drafts and acts. **Deterministic rules decide what counts as proof.**
 | **Claude (Anthropic API, tool use)** | The assistant's reasoning and tool calls, and structured extraction from client threads. It reads and proposes; a person approves |
 | **PayPal Agent Toolkit (Python)** | PayPal's official tool definitions for `get_invoice`, `list_invoices` and `list_transactions`, executed through Kweli's hardened PayPal client ([why](docs/decisions/0001-agent-toolkit.md)) |
 | **PayPal REST APIs (sandbox)** | Invoicing v2, Disputes v1 (`provide-evidence`, plus the sandbox-only `require-evidence`/`adjudicate` to show the full lifecycle), Transaction Search, Subscriptions, Webhooks + signature verification |
-| **AG Grid** | Proof ledger: per-payment proof status, rule badges, grouping by client, export |
+| **AG Grid** | Proof ledger: a badge per proof rule, quick search, status and client filters (external filter), date, text and number column filters, a readiness-by-client view, and CSV export. Only the Community modules used are registered |
 | **Render** | Hosting for the API, frontend, Postgres and background worker |
 
 ## 6. Tech Stack
