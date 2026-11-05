@@ -27,3 +27,9 @@ def get_letter_writer():
     from packs.letter import AnthropicLetterWriter
 
     return AnthropicLetterWriter.from_settings()
+
+
+def get_response_writer():
+    from defender.response import AnthropicResponseWriter
+
+    return AnthropicResponseWriter.from_settings()

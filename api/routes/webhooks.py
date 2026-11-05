@@ -56,7 +56,12 @@ async def paypal_webhook(
         row = WebhookEvent(
             paypal_event_id=event_id,
             event_type=str(event.get("event_type", ""))[:80],
-            resource_id=str((event.get("resource") or {}).get("id", ""))[:64] or None,
+            resource_id=str(
+                (event.get("resource") or {}).get("id")
+                or (event.get("resource") or {}).get("dispute_id")
+                or ""
+            )[:64]
+            or None,
         )
         db.add(row)
     row.attempts = (row.attempts or 0) + 1

@@ -37,7 +37,7 @@ Client agreement  →  PayPal invoice  →  Payment  →  Deliverable  →  ✅ 
 | **3. Proof ledger** | Every incoming payment is matched to its invoice, agreement and deliverable. Gaps are flagged with a plain reason and a fix you can make in place: upload the work, upload the client's confirmation of a third-party payment, or link a payment that didn't come through an invoice to its agreement. Search, filter by status or client, see readiness by client, export to CSV | Webhooks, Invoicing v2, Transaction Search |
 | **4. Readiness score** | One score out of 100 for how ready you are for a PayPal review, and a "fix next" list in priority order with the points each fix wins ([how it's scored](docs/readiness.md)) | — |
 | **5. Compliance Pack** | When an information request arrives, one click builds a PDF + ZIP: a cover letter, a payment-to-document mapping table, agreements, invoices and deliverables, **each cited**. A citation validator blocks any letter that cites a missing document or a wrong amount ([how](docs/compliance-pack.md)) | Invoicing v2, Transaction Search (the records it maps) |
-| **6. Dispute defender** | A client opens a dispute → the agent assembles evidence from the vault, drafts the response *(you approve)* and submits it | Disputes API: `get_dispute`, `provide-evidence`, `send-message`, `make-offer` |
+| **6. Dispute defender** | A client opens a dispute → Kweli re-reads it from PayPal, builds the evidence checklist for that dispute reason from your records, drafts a checked response *(you approve)* and submits it with the agreement, invoice and delivered work attached ([how](docs/disputes.md)) | Disputes v1: show dispute, `provide-evidence` (multipart), sandbox `require-evidence` / `adjudicate` · `CUSTOMER.DISPUTE.*` webhooks |
 | **7. Kweli Pro billing** | Subscriptions for Kweli itself, paid through PayPal | Subscriptions API |
 
 ### Why it's good for PayPal too
@@ -47,7 +47,7 @@ Kweli doesn't help anyone get around checks. It **helps honest users pass them**
 Captured from the seeded demo (`python -m scripts.seed --demo-data`), so every client and payment is synthetic.
 
 <details>
-<summary><b>Open the screenshots</b> (9 images)</summary>
+<summary><b>Open the screenshots</b> (14 images)</summary>
 
 #### Sign in
 <img src="docs/screenshots/01-sign-in.png" alt="Kweli sign-in page" width="800">
@@ -77,6 +77,24 @@ The assistant can only propose. The recipient and amount on the card come from t
 #### The ledger on a phone
 <img src="docs/screenshots/09-ledger-on-phone.png" alt="Proof ledger summary on a phone" width="320">
 
+#### Readiness: what to fix, in order
+One score for how ready you are for a PayPal review, and the fixes ranked by how much each one matters.
+<img src="docs/screenshots/10-readiness-overview.png" alt="Overview with a readiness score of 88 out of 100, nearly ready, and a ranked fix-next list starting with a payment that has no invoice or agreement" width="800">
+
+#### Readiness by client
+<img src="docs/screenshots/11-readiness-by-client.png" alt="Ledger grouped by client with a readiness meter, payment count, total received and status counts per client" width="800">
+
+#### A Compliance Pack
+One click builds a PDF and ZIP. Every claim in the cover letter cites a payment [P…], a document [D…] or Table 1 [T1].
+<img src="docs/screenshots/12-compliance-pack.png" alt="Compliance pack page with download buttons and a cover letter whose citations are highlighted" width="800">
+
+#### The citation validator blocks a wrong amount
+<img src="docs/screenshots/13-letter-blocked.png" alt="Editing the cover letter with an invented USD 12,000.00 total is blocked with an explanation" width="800">
+
+#### The dispute defender
+The evidence checklist for this dispute reason, built from Kweli's records, and a checked response that only goes to PayPal after approval. This is the seeded demo dispute, so Kweli refuses to send it.
+<img src="docs/screenshots/14-dispute-defender.png" alt="Dispute page showing the client's claim, a strong case with delivered work, accepted agreement and invoice ready to attach, and the drafted response with an approve-and-send step" width="800">
+
 </details>
 
 ## 3. Glass Box Agent Design
@@ -88,7 +106,7 @@ Kweli's AI drafts and acts. **Deterministic rules decide what counts as proof.**
 | **LLM (Claude, tool use)** | Reads threads, answers questions with Kweli's and PayPal's data, and *proposes* actions | No: proposals only take IDs; amounts and recipients come from the database |
 | **Proof rules (Python)** | Decide whether a payment is documented: invoice match, amount match, payer = client, deliverable present | No: deterministic, unit-tested and explained per rule |
 | **Citation validator** | Every document the LLM cites must exist in the vault, and every amount must match the ledger. Otherwise the draft is blocked | — |
-| **Human approval gate** | Sending an invoice, submitting dispute evidence and making an offer all need an explicit click | — |
+| **Human approval gate** | Sending an invoice and submitting dispute evidence both need an explicit click, with a single-use token bound to exactly what will be sent | — |
 | **Hash-chained audit log** | Records every agent action and approval, and makes any later edit detectable | — |
 
 ### Proof rules (v1)
@@ -229,7 +247,7 @@ To receive webhooks locally, expose the API (for example with `cloudflared tunne
 4. Watch the payment land in the **Proof ledger** with a full ✅ chain, while an old third-party payment shows ⚠ P3 and its fix.
 5. Open **Overview**: the readiness score and the "fix next" list. Fix one in place and watch the score move.
 6. Open **Compliance packs** → **Build the pack** → download the PDF with every payment mapped to cited documents. Try editing the letter with a wrong amount: the validator blocks it.
-7. Open a sandbox dispute → Kweli drafts evidence from the vault → approve → submit → adjudicate in the sandbox.
+7. Open a sandbox dispute as the buyer → it appears in **Disputes** with its evidence checklist → **Prepare the response** → **Approve and send** → decide it with the sandbox tools.
 
 ## 9. Security & Privacy
 

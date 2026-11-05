@@ -60,6 +60,7 @@ class PayPalClient:
         *,
         json: dict | None = None,
         raw_json: bytes | None = None,
+        files: list | None = None,
         params: dict | None = None,
         request_id: str | None = None,
         prefer_representation: bool = False,
@@ -85,8 +86,9 @@ class PayPalClient:
                 response = self.http.request(
                     method,
                     f"{self.settings.paypal_base_url}{path}",
-                    json=json if raw_json is None else None,
+                    json=json if raw_json is None and files is None else None,
                     content=raw_json,
+                    files=files,
                     params=params,
                     headers=headers,
                 )

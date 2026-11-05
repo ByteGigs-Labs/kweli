@@ -4,6 +4,8 @@ import type {
   AgentReply,
   ChatMessage,
   Agreement,
+  Dispute,
+  DisputeSummary,
   AgreementInput,
   EngagementDraft,
   Invoice,
@@ -118,6 +120,33 @@ export const getPack = async (id: string) =>
 export const editPackLetter = async (id: string, letter: string) =>
   (await http.put<Pack>(`/v1/packs/${encodeURIComponent(id)}/letter`, { letter }, { timeout: 120000 }))
     .data;
+
+const disputePath = (id: string, action = "") =>
+  `/v1/disputes/${encodeURIComponent(id)}${action ? `/${action}` : ""}`;
+
+export const listDisputes = async () => (await http.get<DisputeSummary[]>("/v1/disputes")).data;
+
+export const getDispute = async (id: string) => (await http.get<Dispute>(disputePath(id))).data;
+
+export const prepareDispute = async (id: string) =>
+  (await http.post<Dispute>(disputePath(id, "prepare"), undefined, { timeout: 90000 })).data;
+
+export const editDisputeResponse = async (id: string, text: string) =>
+  (await http.put<Dispute>(disputePath(id, "response"), { text })).data;
+
+export const approveDispute = async (id: string) =>
+  (await http.post<Dispute>(disputePath(id, "approval"))).data;
+
+export const submitDispute = async (id: string, token: string) =>
+  (await http.post<Dispute>(disputePath(id, "submit"), { token }, { timeout: 120000 })).data;
+
+export const refreshDispute = async (id: string) =>
+  (await http.post<Dispute>(disputePath(id, "refresh"))).data;
+
+export const sandboxDispute = async (
+  id: string,
+  action: "require_evidence" | "seller_favor" | "buyer_favor",
+) => (await http.post<Dispute>(disputePath(id, "sandbox"), { action }, { timeout: 60000 })).data;
 
 export const errorMessage = (failure: unknown, fallback: string) => {
   const data = (failure as { response?: { data?: { error?: { message?: string } } } }).response?.data;

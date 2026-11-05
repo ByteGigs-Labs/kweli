@@ -41,7 +41,7 @@ jobs:
       - run: pip install --no-deps -r requirements-nodeps.txt
       - run: ruff check .
       - run: ruff format --check .
-      - run: pytest -q --cov=api --cov=paypal --cov=proof --cov=audit --cov=vault --cov=packs --cov=scripts --cov-fail-under=85
+      - run: pytest -q --cov=api --cov=paypal --cov=proof --cov=audit --cov=vault --cov=packs --cov=defender --cov=scripts --cov-fail-under=85
       - name: Audit the environment exactly as installed (toolkit without its pins)
         run: pip-audit
 
@@ -94,4 +94,4 @@ jobs:
       - run: docker compose config --quiet
       - run: docker compose build api
       - name: App imports inside the built image
-        run: docker compose run --rm --no-deps api python -c "import api.main, packs.render, scripts.seed, scripts.demo_data, scripts.refresh_payers; from agent.toolkit import toolkit_specs; toolkit_specs({'get_invoice', 'list_invoices', 'list_transactions'})"
+        run: docker compose run --rm --no-deps api python -c "import api.main, packs.render, defender.files, scripts.seed, scripts.demo_data, scripts.refresh_payers; from agent.toolkit import toolkit_specs; toolkit_specs({'get_invoice', 'list_invoices', 'list_transactions'})"
