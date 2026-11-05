@@ -14,6 +14,7 @@ from api.routes import (
     documents,
     invoices,
     ledger,
+    packs,
     portal,
     readiness,
     webhooks,
@@ -27,7 +28,7 @@ def create_app() -> FastAPI:
         CORSMiddleware,
         allow_origins=get_settings().cors_origins,
         allow_credentials=True,
-        allow_methods=["GET", "POST", "PATCH", "DELETE"],
+        allow_methods=["GET", "POST", "PUT", "PATCH", "DELETE"],
         allow_headers=["Content-Type"],
         expose_headers=["X-Total-Count", "X-Request-ID"],
     )
@@ -45,6 +46,7 @@ def create_app() -> FastAPI:
         documents,
         ledger,
         readiness,
+        packs,
         agent,
     ):
         app.include_router(module.router)

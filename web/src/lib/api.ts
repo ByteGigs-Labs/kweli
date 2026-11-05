@@ -8,7 +8,10 @@ import type {
   EngagementDraft,
   Invoice,
   LedgerDetail,
+  LetterProblem,
   LedgerRow,
+  Pack,
+  PackSummary,
   PortalAgreement,
   Readiness,
   StoredDocument,
@@ -98,7 +101,31 @@ export const approveAction = async (id: string, token: string) =>
 export const rejectAction = async (id: string) =>
   (await http.post<AgentAction>(`/v1/agent/actions/${encodeURIComponent(id)}/reject`)).data;
 
+export const createPack = async (periodStart: string, periodEnd: string) =>
+  (
+    await http.post<Pack>(
+      "/v1/packs",
+      { period_start: periodStart, period_end: periodEnd },
+      { timeout: 120000 },
+    )
+  ).data;
+
+export const listPacks = async () => (await http.get<PackSummary[]>("/v1/packs")).data;
+
+export const getPack = async (id: string) =>
+  (await http.get<Pack>(`/v1/packs/${encodeURIComponent(id)}`)).data;
+
+export const editPackLetter = async (id: string, letter: string) =>
+  (await http.put<Pack>(`/v1/packs/${encodeURIComponent(id)}/letter`, { letter }, { timeout: 120000 }))
+    .data;
+
 export const errorMessage = (failure: unknown, fallback: string) => {
   const data = (failure as { response?: { data?: { error?: { message?: string } } } }).response?.data;
   return data?.error?.message ?? fallback;
+};
+
+export const errorProblems = (failure: unknown) => {
+  const data = (failure as { response?: { data?: { error?: { problems?: LetterProblem[] } } } }).response
+    ?.data;
+  return data?.error?.problems ?? [];
 };

@@ -21,3 +21,9 @@ def get_llm():
     from agent.llm import AnthropicLLM
 
     return AnthropicLLM.from_settings()
+
+
+def get_letter_writer():
+    from packs.letter import AnthropicLetterWriter
+
+    return AnthropicLetterWriter.from_settings()

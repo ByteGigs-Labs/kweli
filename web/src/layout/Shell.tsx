@@ -11,7 +11,7 @@ const NAV: { to: string; label: string; ready: boolean }[] = [
   { to: "/agreements", label: "Agreements", ready: true },
   { to: "/invoices", label: "Invoices", ready: true },
   { to: "/disputes", label: "Disputes", ready: false },
-  { to: "/packs", label: "Compliance packs", ready: false },
+  { to: "/packs", label: "Compliance packs", ready: true },
 ];
 
 export function Shell() {

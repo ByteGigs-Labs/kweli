@@ -46,7 +46,7 @@ Task **X-01**. After both of you approve this file, changes need a PR approved b
 | `POST /v1/documents` · `GET /v1/documents/{id}/url` | Encrypted vault upload + signed URL. Kinds: `deliverable`, `payer_confirmation` (needs `agreement_id`), `correspondence`, `other` | Friend |
 | `POST /v1/agent/messages` | Chat with the agent (streams) | Friend |
 | `POST /v1/agent/actions/{id}/approve` · `POST /v1/agent/actions/{id}/reject` | Approval gate | Friend |
-| `POST /v1/packs` · `GET /v1/packs` · `GET /v1/packs/{id}` | Compliance Packs | Friend |
+| `POST /v1/packs` · `GET /v1/packs` · `GET /v1/packs/{id}` · `PUT /v1/packs/{id}/letter` | Compliance Packs. An edited letter is validated first; a rejected one returns 422 `letter_rejected` with `problems` ([docs/compliance-pack.md](compliance-pack.md)) | Friend |
 | `GET /v1/disputes` · `GET /v1/disputes/{id}` · `POST /v1/disputes/{id}/draft` | Disputes | Friend |
 | `POST /v1/webhooks/paypal` | PayPal webhooks (signature verified) | Me |
 | `GET /v1/billing` · `POST /v1/billing/subscribe` | Kweli Pro (PayPal Subscriptions) | Me |

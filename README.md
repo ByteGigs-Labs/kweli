@@ -36,7 +36,7 @@ Client agreement  →  PayPal invoice  →  Payment  →  Deliverable  →  ✅ 
 | **2. Assistant** | "Invoice Acme for the logo, due in 7 days" → the assistant finds the agreement and prepares the invoice → you approve the card → Kweli creates and sends a real PayPal invoice tied to the agreement | Invoicing v2 (draft, send, remind) · Agent Toolkit read tools: `get_invoice`, `list_invoices`, `list_transactions` |
 | **3. Proof ledger** | Every incoming payment is matched to its invoice, agreement and deliverable. Gaps are flagged with a plain reason and a fix you can make in place: upload the work, upload the client's confirmation of a third-party payment, or link a payment that didn't come through an invoice to its agreement. Search, filter by status or client, see readiness by client, export to CSV | Webhooks, Invoicing v2, Transaction Search |
 | **4. Readiness score** | One score out of 100 for how ready you are for a PayPal review, and a "fix next" list in priority order with the points each fix wins ([how it's scored](docs/readiness.md)) | — |
-| **5. Compliance Pack** | When an information request arrives, one click builds a PDF + ZIP: a cover letter, a payment-to-document mapping table, contracts, invoices and deliverables, **each cited** | Transaction Search |
+| **5. Compliance Pack** | When an information request arrives, one click builds a PDF + ZIP: a cover letter, a payment-to-document mapping table, agreements, invoices and deliverables, **each cited**. A citation validator blocks any letter that cites a missing document or a wrong amount ([how](docs/compliance-pack.md)) | Invoicing v2, Transaction Search (the records it maps) |
 | **6. Dispute defender** | A client opens a dispute → the agent assembles evidence from the vault, drafts the response *(you approve)* and submits it | Disputes API: `get_dispute`, `provide-evidence`, `send-message`, `make-offer` |
 | **7. Kweli Pro billing** | Subscriptions for Kweli itself, paid through PayPal | Subscriptions API |
 
@@ -227,8 +227,9 @@ To receive webhooks locally, expose the API (for example with `cloudflared tunne
 2. Paste a client thread → the agent drafts an agreement → open the client link → **Accept**.
 3. Open **Assistant** and ask: *"Invoice them for the logo, due in 7 days"* → check the approval card → **Approve** → the invoice arrives in the sandbox client's inbox → pay it.
 4. Watch the payment land in the **Proof ledger** with a full ✅ chain, while an old third-party payment shows ⚠ P3 and its fix.
-5. Click **Generate Compliance Pack** → download the PDF with every payment mapped to cited documents.
-6. Open a sandbox dispute → Kweli drafts evidence from the vault → approve → submit → adjudicate in the sandbox.
+5. Open **Overview**: the readiness score and the "fix next" list. Fix one in place and watch the score move.
+6. Open **Compliance packs** → **Build the pack** → download the PDF with every payment mapped to cited documents. Try editing the letter with a wrong amount: the validator blocks it.
+7. Open a sandbox dispute → Kweli drafts evidence from the vault → approve → submit → adjudicate in the sandbox.
 
 ## 9. Security & Privacy
 

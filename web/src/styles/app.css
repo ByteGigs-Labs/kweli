@@ -723,3 +723,16 @@ a {
   flex: 1 1 220px;
   width: auto;
 }
+
+/* Collapsible explainers */
+.score-explainer {
+  max-width: 72ch;
+  margin-top: calc(var(--space) * 4);
+  color: var(--ink-soft);
+}
+
+.score-explainer summary {
+  color: var(--ink);
+  font-weight: 600;
+  cursor: pointer;
+}

@@ -204,3 +204,41 @@ export interface ChatMessage {
   role: "user" | "assistant";
   content: string;
 }
+
+export type LetterSource = "ai" | "standard" | "edited";
+
+export interface LetterProblem {
+  code: string;
+  message: string;
+  excerpt: string;
+}
+
+export interface PackSummary {
+  id: string;
+  period_start: string;
+  period_end: string;
+  letter_source: LetterSource;
+  payments: number;
+  statuses: Partial<Record<ProofStatus, number>>;
+  totals: { currency: string; amount_minor: number }[];
+  created_at: string;
+  updated_at: string | null;
+  pdf_document_id: string | null;
+  zip_document_id: string | null;
+}
+
+export interface Pack extends PackSummary {
+  letter: string;
+  summary: {
+    payments: number;
+    clients: number;
+    documents: number;
+    attached: number;
+    left_out: string[];
+    ai_rejected: LetterProblem[];
+    letter_attempts: number;
+    pdf_sha256: string;
+    zip_sha256: string;
+    audit_head: string;
+  };
+}
