@@ -11,6 +11,7 @@ from api.routes import (
     audit,
     auth,
     clients,
+    disputes,
     documents,
     invoices,
     ledger,
@@ -47,6 +48,7 @@ def create_app() -> FastAPI:
         ledger,
         readiness,
         packs,
+        disputes,
         agent,
     ):
         app.include_router(module.router)

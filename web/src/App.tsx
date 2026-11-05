@@ -28,6 +28,12 @@ const PacksPage = lazy(() => import("./pages/packs/List").then((m) => ({ default
 const PackDetailPage = lazy(() =>
   import("./pages/packs/Detail").then((m) => ({ default: m.PackDetailPage })),
 );
+const DisputesPage = lazy(() =>
+  import("./pages/disputes/List").then((m) => ({ default: m.DisputesPage })),
+);
+const DisputeDetailPage = lazy(() =>
+  import("./pages/disputes/Detail").then((m) => ({ default: m.DisputeDetailPage })),
+);
 const PortalPage = lazy(() => import("./pages/Portal").then((m) => ({ default: m.PortalPage })));
 
 export default function App() {
@@ -44,6 +50,7 @@ export default function App() {
           { name: "invoices", list: "/invoices" },
           { name: "assistant", list: "/assistant" },
           { name: "packs", list: "/packs", show: "/packs/:id" },
+          { name: "disputes", list: "/disputes", show: "/disputes/:id" },
         ]}
         options={{ syncWithLocation: false, disableTelemetry: true }}
       >
@@ -67,6 +74,8 @@ export default function App() {
             <Route path="/assistant" element={<AssistantPage />} />
             <Route path="/packs" element={<PacksPage />} />
             <Route path="/packs/:id" element={<PackDetailPage />} />
+            <Route path="/disputes" element={<DisputesPage />} />
+            <Route path="/disputes/:id" element={<DisputeDetailPage />} />
           </Route>
           <Route
             element={

@@ -242,3 +242,54 @@ export interface Pack extends PackSummary {
     audit_head: string;
   };
 }
+
+export type EvidenceStatus = "ready" | "partial" | "missing";
+
+export interface DisputeEvidence {
+  key: string;
+  label: string;
+  why: string;
+  evidence_type: string;
+  status: EvidenceStatus;
+  detail: string;
+  fix: string | null;
+  notes: string[];
+  files: { name: string; source: string }[];
+}
+
+export interface DisputeSummary {
+  id: string;
+  paypal_dispute_id: string;
+  reason: string;
+  reason_label: string;
+  status: string;
+  amount_minor: number;
+  currency: string;
+  client: string | null;
+  payment_id: string | null;
+  agreement_id: string | null;
+  evidence_due_at: string | null;
+  outcome: string | null;
+  submitted_at: string | null;
+  source: "webhook" | "seed";
+  created_at: string;
+}
+
+export interface Dispute extends DisputeSummary {
+  stage: string | null;
+  allowed: string[];
+  buyer_messages: { posted_by: string; time: string; content: string }[];
+  response: string | null;
+  response_source: LetterSource | null;
+  rejected: LetterProblem[];
+  evidence: DisputeEvidence[];
+  strength: "strong" | "fair" | "weak";
+  submission: {
+    at: string;
+    generic_types: boolean;
+    files: { evidence: string; name: string; sha256: string; bytes: number }[];
+  } | null;
+  approval_expires_at: string | null;
+  sandbox_tools: boolean;
+  approval_token: string | null;
+}

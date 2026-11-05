@@ -7,7 +7,7 @@ from datetime import UTC, date, datetime, timedelta
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
-from api.db.models import Agreement, Document, DocumentBlob, Invoice, Payment, User
+from api.db.models import Agreement, Dispute, Document, DocumentBlob, Invoice, Payment, User
 from api.services.agreements import find_or_create_client
 from proof.engine import evaluate_payment
 from vault.crypto import encrypt
@@ -91,7 +91,9 @@ SCENARIOS = (
 PDF = b"%PDF-1.4\n%Kweli demo deliverable\n1 0 obj<<>>endobj\ntrailer<<>>\n%%EOF\n"
 
 
-def _deliverable(db: Session, user: User, agreement: Agreement, title: str) -> None:
+def _deliverable(
+    db: Session, user: User, agreement: Agreement, title: str, delivered: datetime
+) -> None:
     document = Document(
         user_id=user.id,
         agreement_id=agreement.id,
@@ -102,6 +104,7 @@ def _deliverable(db: Session, user: User, agreement: Agreement, title: str) -> N
         sha256=hashlib.sha256(PDF).hexdigest(),
         storage_key="db",
         encrypted_dek="",
+        created_at=delivered,
     )
     db.add(document)
     db.flush()
@@ -154,7 +157,7 @@ def build_demo_ledger(db: Session, user: User, now: datetime | None = None) -> i
                 )
             )
             if scenario.deliverable:
-                _deliverable(db, user, agreement, scenario.title)
+                _deliverable(db, user, agreement, scenario.title, received - timedelta(days=2))
         payer_name, payer_email = scenario.payer or (scenario.client, scenario.email)
         payment = Payment(
             user_id=user.id,
@@ -174,5 +177,28 @@ def build_demo_ledger(db: Session, user: User, now: datetime | None = None) -> i
     db.flush()
     for payment in payments:
         evaluate_payment(db, payment)
+    logo = next(p for p in payments if p.paypal_transaction_id == "SEED-PAY-0005")
+    db.add(
+        Dispute(
+            user_id=user.id,
+            paypal_dispute_id="PP-D-SEED-0001",
+            payment_id=logo.id,
+            reason="MERCHANDISE_OR_SERVICE_NOT_RECEIVED",
+            status="WAITING_FOR_SELLER_RESPONSE",
+            stage="INQUIRY",
+            source="seed",
+            amount_minor=logo.amount_minor,
+            currency=logo.currency,
+            evidence_due_at=(now + timedelta(days=9)).replace(microsecond=0),
+            allowed=["accept_claim", "provide_evidence"],
+            buyer_messages=[
+                {
+                    "posted_by": "BUYER",
+                    "time": (now - timedelta(days=1)).isoformat(timespec="seconds"),
+                    "content": "I paid for the logo but never received the final files.",
+                }
+            ],
+        )
+    )
     db.commit()
     return len(payments)

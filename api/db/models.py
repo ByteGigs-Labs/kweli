@@ -250,6 +250,13 @@ class ProofFlag(Base):
 
 class Dispute(Base):
     __tablename__ = "disputes"
+    __table_args__ = (
+        _status_check("source", ("webhook", "seed")),
+        CheckConstraint(
+            "response_source IS NULL OR response_source IN ('ai', 'standard', 'edited')",
+            name="response_source_allowed",
+        ),
+    )
 
     id: Mapped[uuid.UUID] = _uuid_pk()
     user_id: Mapped[uuid.UUID] = _user_fk()
@@ -257,10 +264,24 @@ class Dispute(Base):
     payment_id: Mapped[uuid.UUID | None] = mapped_column(ForeignKey("payments.id"))
     reason: Mapped[str] = mapped_column(String(64))
     status: Mapped[str] = mapped_column(String(64))
+    stage: Mapped[str | None] = mapped_column(String(32))
+    source: Mapped[str] = mapped_column(String(10), default="webhook", server_default="webhook")
     amount_minor: Mapped[int] = mapped_column(BigInteger)
     currency: Mapped[str] = mapped_column(String(3))
     evidence_due_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     outcome: Mapped[str | None] = mapped_column(String(64))
+    allowed: Mapped[list] = mapped_column(JSONB, default=list, server_default="[]")
+    buyer_messages: Mapped[list] = mapped_column(JSONB, default=list, server_default="[]")
+    response: Mapped[str | None] = mapped_column(Text)
+    response_source: Mapped[str | None] = mapped_column(String(10))
+    rejected: Mapped[list] = mapped_column(JSONB, default=list, server_default="[]")
+    approval_token_hash: Mapped[str | None] = mapped_column(String(64), unique=True)
+    approval_expires_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    draft_hash: Mapped[str | None] = mapped_column(String(64))
+    submitted_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    submission: Mapped[dict | None] = mapped_column(JSONB)
+    refreshed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    resolved_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     created_at: Mapped[datetime] = _created_at()
 
 

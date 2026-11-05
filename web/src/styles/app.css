@@ -736,3 +736,71 @@ a {
   font-weight: 600;
   cursor: pointer;
 }
+
+/* Where a text came from */
+.source-tag {
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: var(--step--1);
+  font-weight: 700;
+}
+
+.source-ai,
+.source-edited {
+  background: var(--seal-wash);
+  color: var(--seal);
+}
+
+.source-standard {
+  background: var(--paper);
+  color: var(--ink-soft);
+  border: 1px solid var(--line);
+}
+
+/* Shared page parts: back links, card heads, check problems */
+.back-link {
+  margin: 0 0 calc(var(--space) * 1.5);
+}
+
+.pack-letter-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: calc(var(--space) * 1.5);
+}
+
+.pack-letter-head .button {
+  margin-left: auto;
+}
+
+.pack-problems {
+  padding: calc(var(--space) * 1.5) calc(var(--space) * 2);
+  border-radius: var(--radius-control);
+  background: var(--break-wash);
+  color: var(--break);
+}
+
+.pack-problems p,
+.pack-problems ul {
+  margin: 0;
+}
+
+.pack-problems ul {
+  padding-left: 1.2em;
+}
+
+.pack-problems .muted {
+  color: inherit;
+  opacity: 0.85;
+}
+
+.pack-rejected summary {
+  cursor: pointer;
+  color: var(--ink-soft);
+}
+
+.row-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space);
+}

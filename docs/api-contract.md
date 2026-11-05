@@ -47,7 +47,7 @@ Task **X-01**. After both of you approve this file, changes need a PR approved b
 | `POST /v1/agent/messages` | Chat with the agent (streams) | Friend |
 | `POST /v1/agent/actions/{id}/approve` · `POST /v1/agent/actions/{id}/reject` | Approval gate | Friend |
 | `POST /v1/packs` · `GET /v1/packs` · `GET /v1/packs/{id}` · `PUT /v1/packs/{id}/letter` | Compliance Packs. An edited letter is validated first; a rejected one returns 422 `letter_rejected` with `problems` ([docs/compliance-pack.md](compliance-pack.md)) | Friend |
-| `GET /v1/disputes` · `GET /v1/disputes/{id}` · `POST /v1/disputes/{id}/draft` | Disputes | Friend |
+| `GET /v1/disputes` · `GET /v1/disputes/{id}` · `POST /v1/disputes/{id}/prepare` · `PUT /v1/disputes/{id}/response` · `POST /v1/disputes/{id}/approval` · `POST /v1/disputes/{id}/submit` · `POST /v1/disputes/{id}/refresh` · `POST /v1/disputes/{id}/sandbox` | Dispute defender: evidence checklist, checked response, approval token bound to the exact draft, `provide-evidence` ([docs/disputes.md](disputes.md)) | Friend |
 | `POST /v1/webhooks/paypal` | PayPal webhooks (signature verified) | Me |
 | `GET /v1/billing` · `POST /v1/billing/subscribe` | Kweli Pro (PayPal Subscriptions) | Me |
 | `GET /v1/audit/verify` | Audit chain status | Me |

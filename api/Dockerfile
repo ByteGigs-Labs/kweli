@@ -21,6 +21,7 @@ COPY audit audit
 COPY vault vault
 COPY agent agent
 COPY packs packs
+COPY defender defender
 COPY scripts scripts
 
 RUN useradd --system --create-home kweli

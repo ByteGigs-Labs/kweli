@@ -21,6 +21,10 @@ from proof.engine import evaluate_payment
 
 logger = logging.getLogger("kweli.payments")
 
+DISPUTE_EVENTS = frozenset(
+    {"CUSTOMER.DISPUTE.CREATED", "CUSTOMER.DISPUTE.UPDATED", "CUSTOMER.DISPUTE.RESOLVED"}
+)
+
 INVOICE_STATUS = {
     "PAID": "paid",
     "MARKED_AS_PAID": "paid",
@@ -177,9 +181,14 @@ def cancel_invoice(db: Session, paypal_invoice_id: str) -> Outcome:
 
 def handle_event(db: Session, paypal: PayPalClient, event: dict) -> Outcome:
     kind = event.get("event_type", "")
-    resource_id = str((event.get("resource") or {}).get("id") or "")
+    resource = event.get("resource") or {}
+    resource_id = str(resource.get("id") or resource.get("dispute_id") or "")
     if not resource_id:
         return Outcome("ignored", "event has no resource id")
+    if kind in DISPUTE_EVENTS:
+        from api.services.disputes import sync
+
+        return sync(db, paypal, str(resource.get("dispute_id") or resource_id))
     if kind in ("INVOICING.INVOICE.PAID", "INVOICING.INVOICE.UPDATED"):
         return ingest_invoice(db, paypal, resource_id)
     if kind == "INVOICING.INVOICE.CANCELLED":
