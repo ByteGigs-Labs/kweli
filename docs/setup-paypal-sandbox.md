@@ -1,4 +1,4 @@
-# PayPal Sandbox Setup (task M-02)
+# PayPal Sandbox Setup
 
 The sandbox is PayPal's test environment: fake accounts and fake money, with the same APIs as live. **Kweli only ever uses the sandbox.**
 
@@ -6,7 +6,7 @@ The sandbox is PayPal's test environment: fake accounts and fake money, with the
 You sign in to developer.paypal.com with a normal PayPal login.
 - If your PayPal account is **limited or closed**, try logging in anyway: the developer dashboard and the sandbox are separate from your live balance, and often still work.
 - If it's blocked, **the teammate whose account is in good standing creates the developer account** and shares the sandbox credentials through a password manager (Bitwarden or 1Password). The sandbox *test accounts* in step 2 can be used by anyone who has their email and password.
-- Don't open a new live PayPal account just to get around a permanent limitation. That can breach PayPal's User Agreement, and the hackathon doesn't need it.
+- Don't open a new live PayPal account just to get around a permanent limitation. That can breach PayPal's User Agreement Kweli only needs the sandbox.
 
 ## 1. Sign in
 1. Go to https://developer.paypal.com and click **Log in to Dashboard**.

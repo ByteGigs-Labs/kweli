@@ -1,10 +1,9 @@
-# Render Setup (task M-03)
+# Deploying on Render
 
-Render hosts Kweli's API, database and (from Day 1) the web app. The `render.yaml` Blueprint in this repo describes everything.
+Render hosts Kweli's API, web app and database. The `render.yaml` Blueprint in this repo describes everything.
 
 ## 1. Account
 1. Go to https://render.com → **Get Started** → **Sign up with GitHub** (use the account that's in ByteGigs-Labs).
-2. Check the hackathon's Devpost **Resources** and **Updates** pages for a Render credit code, and redeem it under **Workspace → Billing**.
 
 ## 2. Give Render access to the repo
 1. In Render, **New → Blueprint**.
@@ -19,9 +18,9 @@ Render hosts Kweli's API, database and (from Day 1) the web app. The `render.yam
 |---|---|
 | `PAYPAL_CLIENT_ID` / `PAYPAL_CLIENT_SECRET` | From the sandbox app |
 | `PAYPAL_WEBHOOK_ID` | Leave empty for now, and add it after registering the webhook |
-| `ANTHROPIC_API_KEY` | Your key (needed from Day 2) |
+| `ANTHROPIC_API_KEY` | Your Anthropic API key. Without it, the AI features say they aren't set up and everything else works |
 | `VAULT_MASTER_KEY` | `python -c "import secrets,base64;print(base64.b64encode(secrets.token_bytes(32)).decode())"` |
-| `DEMO_USER_PASSWORD` | A password of 10+ characters for the demo login (share it with judges in the Devpost text) |
+| `DEMO_USER_PASSWORD` | A password of 10+ characters for the demo login |
 | `PAYPAL_MERCHANT_ID` | The sandbox Business account's merchant ID (Account info in the sandbox dashboard). Turns on the PayPal Agent Toolkit tools for the demo freelancer |
 | `PAYPAL_PLAN_ID` | Leave empty at first. Step 5 creates it. Until it's set, billing is off and every feature is open |
 
@@ -44,8 +43,8 @@ In the sandbox app, add the webhook `https://kweli-api.onrender.com/v1/webhooks/
 The web app reaches the API through a rewrite (`/v1/*` → `kweli-api`), so the browser only ever talks to `kweli-web` and the session cookie stays first-party. If Render gives either service a different URL, update the rewrite destination in `render.yaml`, the `CORS_ORIGINS` value and `docs/webhooks.md`.
 
 ## 7. Things to know
-- **Free web services sleep** after about 15 minutes idle, and the first request then takes up to a minute. **Before submitting on 12 Nov, move `kweli-api` to a paid instance** so judges don't hit a cold start.
-- **Free Postgres expires** after a limited time. Judging runs to **21 Dec 2026**, so upgrade the database (or use credits) before submitting. Check Render's current free-tier limits.
+- **Free web services sleep** after about 15 minutes idle, and the first request then takes up to a minute. **For a demo people will visit, move `kweli-api` to a paid instance** so nobody hits a cold start.
+- **Free Postgres expires** after a limited time. Upgrade the database before it does, and check Render's current free-tier limits.
 - Region is **Frankfurt**, the closest Render region to Kenya.
 - Every push to `main` redeploys automatically (`autoDeploy: true`).
 - Never put secrets in `render.yaml`. Only keys marked `sync: false`, with values entered in the dashboard.

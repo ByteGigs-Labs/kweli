@@ -1,6 +1,6 @@
-# Kweli — Data Model & API Contract (v0, Day 0 draft)
+# Kweli — Data Model & API Contract
 
-Task **X-01**. After both of you approve this file, changes need a PR approved by both.
+Changes to this contract go through a pull request with the code that implements them.
 
 ## Conventions
 - Money is stored as **integer minor units + ISO currency** (`amount_minor=80000, currency="USD"`), never floats.
@@ -12,45 +12,45 @@ Task **X-01**. After both of you approve this file, changes need a PR approved b
 
 ## Tables
 
-| Table | Key columns | Owner |
-|---|---|---|
-| `users` | id, email, name, password_hash, plan (`free`/`pro`), created_at | Me |
-| `sessions` | id (hashed token), user_id, expires_at | Me |
-| `clients` | id, user_id, name, email, country, paypal_payer_id (nullable) | Friend |
-| `agreements` | id, user_id, client_id, scope, deliverables (json), amount_minor, currency, due_date, status (`draft`/`sent`/`accepted`/`expired`), pdf_document_id, accept_token_hash, accepted_at, accepted_ip_hash, accepted_user_agent, created_at | Friend |
-| `invoices` | id, user_id, client_id, agreement_id, paypal_invoice_id, number, amount_minor, currency, status, sent_at, paid_at | Friend |
-| `payments` | id, user_id, paypal_capture_id / transaction_id, paypal_invoice_id, payer_email, payer_id, amount_minor, currency, payment_type (`invoice`/`goods_services`/`personal`/`unknown`), received_at, source (`webhook`/`backfill`/`seed`) | Me |
-| `documents` | id, user_id, kind (`agreement`/`deliverable`/`correspondence`/`id`/`other`), filename, mime, size, sha256, storage_key, encrypted_dek, created_at | Friend |
-| `payment_links` | payment_id, invoice_id, agreement_id, deliverable_document_id (all nullable) | Me |
-| `proof_flags` | id, payment_id, rule (`P1`–`P7`), status (`pass`/`warn`/`fail`), explanation, fix, evaluated_at | Me |
-| `disputes` | id, user_id, paypal_dispute_id, payment_id, reason, status, amount_minor, currency, evidence_due_at, outcome | Friend |
-| `packs` | id, user_id, period_start, period_end, pdf_document_id, zip_document_id, created_at | Friend |
-| `agent_actions` | id, user_id, tool, arguments (json), status (`proposed`/`approved`/`rejected`/`executed`/`failed`), approval_token_hash, result (json) | Friend |
-| `webhook_events` | paypal_event_id (unique), event_type, received_at, processed_at, status | Me |
-| `subscriptions` | id, user_id, paypal_subscription_id, plan_id, status | Me |
-| `audit_log` | id, user_id, action, payload (json), prev_hash, hash, created_at | Me |
+| Table | Key columns |
+|---|---|
+| `users` | id, email, name, password_hash, plan (`free`/`pro`), created_at |
+| `sessions` | id (hashed token), user_id, expires_at |
+| `clients` | id, user_id, name, email, country, paypal_payer_id (nullable) |
+| `agreements` | id, user_id, client_id, scope, deliverables (json), amount_minor, currency, due_date, status (`draft`/`sent`/`accepted`/`expired`), pdf_document_id, accept_token_hash, accepted_at, accepted_ip_hash, accepted_user_agent, created_at |
+| `invoices` | id, user_id, client_id, agreement_id, paypal_invoice_id, number, amount_minor, currency, status, sent_at, paid_at |
+| `payments` | id, user_id, paypal_capture_id / transaction_id, paypal_invoice_id, payer_email, payer_id, amount_minor, currency, payment_type (`invoice`/`goods_services`/`personal`/`unknown`), received_at, source (`webhook`/`backfill`/`seed`) |
+| `documents` | id, user_id, kind (`agreement`/`deliverable`/`correspondence`/`id`/`other`), filename, mime, size, sha256, storage_key, encrypted_dek, created_at |
+| `payment_links` | payment_id, invoice_id, agreement_id, deliverable_document_id (all nullable) |
+| `proof_flags` | id, payment_id, rule (`P1`–`P7`), status (`pass`/`warn`/`fail`), explanation, fix, evaluated_at |
+| `disputes` | id, user_id, paypal_dispute_id, payment_id, reason, status, amount_minor, currency, evidence_due_at, outcome |
+| `packs` | id, user_id, period_start, period_end, pdf_document_id, zip_document_id, created_at |
+| `agent_actions` | id, user_id, tool, arguments (json), status (`proposed`/`approved`/`rejected`/`executed`/`failed`), approval_token_hash, result (json) |
+| `webhook_events` | paypal_event_id (unique), event_type, received_at, processed_at, status |
+| `subscriptions` | id, user_id, paypal_subscription_id, plan_id, status |
+| `audit_log` | id, user_id, action, payload (json), prev_hash, hash, created_at |
 
 ## Endpoints
 
-| Method + path | Purpose | Owner |
-|---|---|---|
-| `GET /health` | Liveness | Friend (done) |
-| `POST /v1/auth/login` · `POST /v1/auth/logout` · `GET /v1/auth/me` | Session auth | Me |
-| `GET/POST /v1/clients` · `GET/PATCH /v1/clients/{id}` | Clients | Friend |
-| `POST /v1/agreements/extract` | Pasted thread → structured engagement (LLM) | Friend |
-| `GET/POST /v1/agreements` · `GET /v1/agreements/{id}` · `POST /v1/agreements/{id}/send` | Agreements | Friend |
-| `GET /v1/portal/agreements/{token}` · `POST /v1/portal/agreements/{token}/accept` | Public client portal (no login) | Friend |
-| `GET/POST /v1/invoices` · `POST /v1/invoices/{id}/send` · `POST /v1/invoices/{id}/remind` | Invoices (via the approval gate) | Friend |
-| `GET /v1/ledger` · `GET /v1/ledger/{payment_id}` · `POST /v1/ledger/{payment_id}/agreement` | Proof ledger + chain; link a payment that has no Kweli invoice to its agreement (`{agreement_id}` or `null` to unlink) | Me |
-| `GET /v1/readiness?limit=` | Readiness score, band, "fix next" in priority order, per-client summary ([docs/readiness.md](readiness.md)) | Me |
-| `POST /v1/documents` · `GET /v1/documents/{id}/url` | Encrypted vault upload + signed URL. Kinds: `deliverable`, `payer_confirmation` (needs `agreement_id`), `correspondence`, `other` | Friend |
-| `POST /v1/agent/messages` | Chat with the agent (streams) | Friend |
-| `POST /v1/agent/actions/{id}/approve` · `POST /v1/agent/actions/{id}/reject` | Approval gate | Friend |
-| `POST /v1/packs` · `GET /v1/packs` · `GET /v1/packs/{id}` · `PUT /v1/packs/{id}/letter` | Compliance Packs. An edited letter is validated first; a rejected one returns 422 `letter_rejected` with `problems` ([docs/compliance-pack.md](compliance-pack.md)) | Friend |
-| `GET /v1/disputes` · `GET /v1/disputes/{id}` · `POST /v1/disputes/{id}/prepare` · `PUT /v1/disputes/{id}/response` · `POST /v1/disputes/{id}/approval` · `POST /v1/disputes/{id}/submit` · `POST /v1/disputes/{id}/refresh` · `POST /v1/disputes/{id}/sandbox` | Dispute defender: evidence checklist, checked response, approval token bound to the exact draft, `provide-evidence` ([docs/disputes.md](disputes.md)) | Friend |
-| `POST /v1/webhooks/paypal` | PayPal webhooks (signature verified) | Me |
-| `GET /v1/billing` · `POST /v1/billing/checkout` · `POST /v1/billing/confirm` · `POST /v1/billing/cancel` | Kweli Pro (PayPal Subscriptions). Checkout returns PayPal's approve link; confirm re-reads the subscription and checks plan and `custom_id`. Pro-only routes return 402 | Me |
-| `GET /v1/audit/verify` | Audit chain status | Me |
+| Method + path | Purpose |
+|---|---|
+| `GET /health` | Liveness |
+| `POST /v1/auth/login` · `POST /v1/auth/logout` · `GET /v1/auth/me` | Session auth |
+| `GET/POST /v1/clients` · `GET/PATCH /v1/clients/{id}` | Clients |
+| `POST /v1/agreements/extract` | Pasted thread → structured engagement (LLM) |
+| `GET/POST /v1/agreements` · `GET /v1/agreements/{id}` · `POST /v1/agreements/{id}/send` | Agreements |
+| `GET /v1/portal/agreements/{token}` · `POST /v1/portal/agreements/{token}/accept` | Public client portal (no login) |
+| `GET/POST /v1/invoices` · `POST /v1/invoices/{id}/send` · `POST /v1/invoices/{id}/remind` | Invoices (via the approval gate) |
+| `GET /v1/ledger` · `GET /v1/ledger/{payment_id}` · `POST /v1/ledger/{payment_id}/agreement` | Proof ledger + chain; link a payment that has no Kweli invoice to its agreement (`{agreement_id}` or `null` to unlink) |
+| `GET /v1/readiness?limit=` | Readiness score, band, "fix next" in priority order, per-client summary ([docs/readiness.md](readiness.md)) |
+| `POST /v1/documents` · `GET /v1/documents/{id}/url` | Encrypted vault upload + signed URL. Kinds: `deliverable`, `payer_confirmation` (needs `agreement_id`), `correspondence`, `other` |
+| `POST /v1/agent/messages` | Chat with the agent (streams) |
+| `POST /v1/agent/actions/{id}/approve` · `POST /v1/agent/actions/{id}/reject` | Approval gate |
+| `POST /v1/packs` · `GET /v1/packs` · `GET /v1/packs/{id}` · `PUT /v1/packs/{id}/letter` | Compliance Packs. An edited letter is validated first; a rejected one returns 422 `letter_rejected` with `problems` ([docs/compliance-pack.md](compliance-pack.md)) |
+| `GET /v1/disputes` · `GET /v1/disputes/{id}` · `POST /v1/disputes/{id}/prepare` · `PUT /v1/disputes/{id}/response` · `POST /v1/disputes/{id}/approval` · `POST /v1/disputes/{id}/submit` · `POST /v1/disputes/{id}/refresh` · `POST /v1/disputes/{id}/sandbox` | Dispute defender: evidence checklist, checked response, approval token bound to the exact draft, `provide-evidence` ([docs/disputes.md](disputes.md)) |
+| `POST /v1/webhooks/paypal` | PayPal webhooks (signature verified) |
+| `GET /v1/billing` · `POST /v1/billing/checkout` · `POST /v1/billing/confirm` · `POST /v1/billing/cancel` | Kweli Pro (PayPal Subscriptions). Checkout returns PayPal's approve link; confirm re-reads the subscription and checks plan and `custom_id`. Pro-only routes return 402 |
+| `GET /v1/audit/verify` | Audit chain status |
 
 ## Agreement and invoice flow (as built)
 1. `POST /v1/agreements/extract {thread}` returns an `EngagementDraft`: the fields, plus `missing` (fields the thread didn't state) and `notes` (anything Kweli dropped). The model fills one fixed form, and any email or amount that isn't literally in the thread is removed. With no `ANTHROPIC_API_KEY` this returns 503, and the UI switches to filling in by hand.

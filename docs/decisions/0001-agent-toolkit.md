@@ -16,7 +16,7 @@ The parts Kweli uses (`paypal_agent_toolkit.shared`) only import `pydantic`, `ht
 ## Decision
 - Install the toolkit with `pip install --no-deps paypal-agent-toolkit==1.11.0`, next to current `langchain-core` and `langchain-anthropic`.
 - Don't use the toolkit's LangChain wrapper or HTTP client. `agent/paypal_tools.py` builds `StructuredTool`s from the toolkit's specs and runs its handlers through an adapter around **Kweli's own `PayPalClient`**, which has timeouts, retries with backoff, a cached token, `PayPal-Request-Id` idempotency keys and secret-redacted logs.
-- The agent gets only the methods it needs (an allowlist). Money-moving or submitting methods (`send_invoice`, dispute responses and so on) are never given to the model directly. They go through the approval gate (task F-12).
+- The agent gets only the methods it needs (an allowlist). Money-moving or submitting methods (`send_invoice`, dispute responses and so on) are never given to the model directly. They go through the approval gate.
 - CI's `agent` job installs this exact setup and runs `pip-audit` on the resulting environment.
 
 ## Consequences
