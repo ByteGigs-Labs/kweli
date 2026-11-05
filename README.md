@@ -257,7 +257,9 @@ To receive webhooks locally, expose the API (for example with `cloudflared tunne
 - **Prompt-injection defence:** client messages and documents are treated as untrusted data in a separate content channel, and tool calls from them are blocked unless the user approves them.
 - **Documents:** encrypted at rest (AES-GCM, per-user keys wrapped by a master key), served via short-lived signed URLs, with MIME and size checks on upload.
 - **No fabrication:** Kweli never generates receipts, addresses, statements or backdated agreements. It only organises real documents, and every agreement carries its true acceptance timestamp.
-- **Sessions:** httpOnly + Secure + SameSite cookies, Argon2 password hashing, rate-limited login.
+- **Sessions:** httpOnly + Secure + SameSite=Strict cookies, Argon2 password hashing, rate-limited login, and an Origin check that refuses cross-site writes.
+- **Billing:** Pro is only switched on after Kweli reads the subscription back from PayPal and checks that it's for Kweli's plan and was created for this account. No PayPal JavaScript runs on Kweli's pages.
+- **Full review:** every control, where it lives and the test that proves it, in [docs/security-review.md](docs/security-review.md).
 - **Audit:** a hash-chained log of every agent action and approval.
 - **Data protection:** designed around the Kenya Data Protection Act 2019 (minimisation, export and delete on request).
 
@@ -265,8 +267,8 @@ To receive webhooks locally, expose the API (for example with `cloudflared tunne
 
 | Plan | For | Price (indicative) |
 |---|---|---|
-| **Free** | New freelancers | 3 clients, ledger + readiness score |
-| **Pro** | Active freelancers | Monthly subscription via **PayPal Subscriptions**: unlimited clients, Compliance Packs, dispute defender |
+| **Free** | New freelancers | 3 clients, proof ledger, readiness score, agreements, invoices and the assistant. Free |
+| **Pro** | Active freelancers | **USD 9 a month** via **PayPal Subscriptions** (built: server-side checkout, verified on return, kept in step by webhooks): unlimited clients, Compliance Packs, dispute defender |
 | **Agency** | Small agencies and teams | Per-seat pricing, team ledger, subcontractor records |
 | **Partners** | Freelance platforms, coworking spaces, digital-work programmes | Bulk licences and white-label |
 

@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router";
-import { createPack, errorMessage, listPacks } from "../../lib/api";
+import { createPack, errorMessage, listPacks, needsPro } from "../../lib/api";
 import { formatMoney } from "../../lib/money";
 import { useAsync } from "../../lib/useAsync";
 import type { PackSummary } from "../../types";
@@ -61,6 +61,7 @@ export function PacksPage() {
   const [custom, setCustom] = useState(monthsBack(3));
   const [busy, setBusy] = useState(false);
   const [failed, setFailed] = useState<string | null>(null);
+  const [upgrade, setUpgrade] = useState(false);
 
   const period = preset === "custom" ? custom : monthsBack(preset);
 
@@ -71,6 +72,7 @@ export function PacksPage() {
       const pack = await createPack(period.start, period.end);
       navigate(`/packs/${pack.id}`);
     } catch (failure) {
+      setUpgrade(needsPro(failure));
       setFailed(errorMessage(failure, "The pack couldn't be built. Try again."));
       setBusy(false);
     }
@@ -149,7 +151,7 @@ export function PacksPage() {
         </div>
         {failed && (
           <p className="alert" role="alert">
-            {failed}
+            {failed} {upgrade && <Link to="/billing">See Kweli Pro</Link>}
           </p>
         )}
       </section>

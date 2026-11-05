@@ -16,6 +16,7 @@ from api.errors import error_body
 from api.ratelimit import limit_by_key
 from api.security import Principal, current_principal
 from api.services import disputes as service
+from api.services.billing import pro_feature
 from api.services.invoicing import ServiceError
 from defender.evidence import EvidenceItem, plan, reason_label, strength
 from defender.response import MAX_NOTES
@@ -24,6 +25,7 @@ from paypal.errors import PayPalError, PayPalUnavailable
 
 router = APIRouter(prefix="/v1/disputes", tags=["disputes"])
 ACTIONS_PER_MINUTE = 10
+PRO = Depends(pro_feature("The dispute defender"))
 
 
 class FileOut(BaseModel):
@@ -207,7 +209,7 @@ def get_dispute(
     return _out(db, db.get(User, principal.user_id), dispute)
 
 
-@router.post("/{dispute_id}/prepare")
+@router.post("/{dispute_id}/prepare", dependencies=[PRO])
 def prepare(
     dispute_id: UUID,
     principal: Principal = Depends(current_principal),
@@ -226,7 +228,7 @@ def prepare(
     return _out(db, user, dispute, items, token)
 
 
-@router.put("/{dispute_id}/response")
+@router.put("/{dispute_id}/response", dependencies=[PRO])
 def edit_response(
     dispute_id: UUID,
     body: ResponseRequest,
@@ -257,7 +259,7 @@ def edit_response(
     return _out(db, user, dispute, items, token)
 
 
-@router.post("/{dispute_id}/approval")
+@router.post("/{dispute_id}/approval", dependencies=[PRO])
 def approval(
     dispute_id: UUID,
     principal: Principal = Depends(current_principal),
@@ -277,7 +279,7 @@ def approval(
     return _out(db, user, dispute, items, token)
 
 
-@router.post("/{dispute_id}/submit")
+@router.post("/{dispute_id}/submit", dependencies=[PRO])
 def submit(
     dispute_id: UUID,
     body: SubmitRequest,

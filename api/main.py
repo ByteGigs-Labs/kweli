@@ -3,6 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from api.config import get_settings
 from api.errors import install_error_handlers
+from api.hardening import Hardening
 from api.limits import BodySizeLimit
 from api.logging_config import RequestLog, setup_logging
 from api.routes import (
@@ -10,6 +11,7 @@ from api.routes import (
     agreements,
     audit,
     auth,
+    billing,
     clients,
     disputes,
     documents,
@@ -24,7 +26,14 @@ from api.routes import (
 
 def create_app() -> FastAPI:
     setup_logging()
-    app = FastAPI(title="Kweli API", version="0.1.0")
+    docs = get_settings().api_docs
+    app = FastAPI(
+        title="Kweli API",
+        version="0.1.0",
+        docs_url="/docs" if docs else None,
+        redoc_url=None,
+        openapi_url="/openapi.json" if docs else None,
+    )
     app.add_middleware(
         CORSMiddleware,
         allow_origins=get_settings().cors_origins,
@@ -35,6 +44,7 @@ def create_app() -> FastAPI:
     )
     app.add_middleware(BodySizeLimit, upload_prefixes=("/v1/documents", "/v1/disputes"))
     app.add_middleware(RequestLog)
+    app.add_middleware(Hardening)
     install_error_handlers(app)
     for module in (
         auth,
@@ -49,6 +59,7 @@ def create_app() -> FastAPI:
         readiness,
         packs,
         disputes,
+        billing,
         agent,
     ):
         app.include_router(module.router)

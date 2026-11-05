@@ -346,7 +346,9 @@ class Subscription(Base):
     paypal_subscription_id: Mapped[str] = mapped_column(String(64), unique=True)
     plan_id: Mapped[str] = mapped_column(String(64))
     status: Mapped[str] = mapped_column(String(20))
+    next_billing_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     created_at: Mapped[datetime] = _created_at()
+    updated_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
 
 
 class AuditLog(Base):

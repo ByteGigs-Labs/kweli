@@ -7,6 +7,7 @@ import {
   errorMessage,
   errorProblems,
   getDispute,
+  needsPro,
   prepareDispute,
   refreshDispute,
   sandboxDispute,
@@ -99,6 +100,7 @@ function Respond({
   const [problems, setProblems] = useState<LetterProblem[]>([]);
   const [failed, setFailed] = useState<string | null>(null);
   const [confirming, setConfirming] = useState(false);
+  const [upgrade, setUpgrade] = useState(false);
 
   const run = async (label: string, action: () => Promise<Dispute>) => {
     setBusy(label);
@@ -110,6 +112,7 @@ function Respond({
       return next;
     } catch (failure) {
       const found = errorProblems(failure);
+      setUpgrade(needsPro(failure));
       if (found.length) setProblems(found);
       else setFailed(errorMessage(failure, "That didn't work. Try again."));
       return null;
@@ -137,7 +140,7 @@ function Respond({
         </div>
         {failed && (
           <p className="alert" role="alert">
-            {failed}
+            {failed} {upgrade && <Link to="/billing">See Kweli Pro</Link>}
           </p>
         )}
       </div>

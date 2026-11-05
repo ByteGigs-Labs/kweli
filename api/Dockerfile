@@ -28,4 +28,4 @@ RUN useradd --system --create-home kweli
 USER kweli
 
 EXPOSE 8000
-CMD ["sh", "-c", "alembic upgrade head && uvicorn api.main:app --host 0.0.0.0 --port ${PORT:-8000} --proxy-headers --forwarded-allow-ips='*'"]
+CMD ["sh", "-c", "alembic upgrade head && if [ \"$SEED_DEMO_DATA\" = true ]; then python -m scripts.seed --demo-data || echo \"Demo seed skipped\"; fi && uvicorn api.main:app --host 0.0.0.0 --port ${PORT:-8000} --proxy-headers --forwarded-allow-ips='*'"]

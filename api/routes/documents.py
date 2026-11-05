@@ -13,6 +13,7 @@ from sqlalchemy.orm import Session
 from api.config import get_settings
 from api.db.models import Agreement, Document, DocumentBlob
 from api.db.session import get_db
+from api.ratelimit import limit_by_key
 from api.security import Principal, current_principal
 from audit.log import record
 from proof.engine import reevaluate_for_agreement
@@ -66,6 +67,7 @@ async def upload(
     principal: Principal = Depends(current_principal),
     db: Session = Depends(get_db),
 ) -> DocumentOut:
+    limit_by_key(db, "upload", str(principal.user_id), get_settings().uploads_per_minute)
     limit = get_settings().max_upload_bytes
     data = await file.read(limit + 1)
     if not data:

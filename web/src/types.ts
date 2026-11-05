@@ -293,3 +293,14 @@ export interface Dispute extends DisputeSummary {
   sandbox_tools: boolean;
   approval_token: string | null;
 }
+
+export interface Billing {
+  plan: "free" | "pro";
+  enabled: boolean;
+  price: string;
+  currency: string;
+  features: string[];
+  free_client_limit: number;
+  subscription_status: string | null;
+  next_billing_at: string | null;
+}
