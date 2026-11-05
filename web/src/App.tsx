@@ -34,6 +34,7 @@ const DisputesPage = lazy(() =>
 const DisputeDetailPage = lazy(() =>
   import("./pages/disputes/Detail").then((m) => ({ default: m.DisputeDetailPage })),
 );
+const BillingPage = lazy(() => import("./pages/Billing").then((m) => ({ default: m.BillingPage })));
 const PortalPage = lazy(() => import("./pages/Portal").then((m) => ({ default: m.PortalPage })));
 
 export default function App() {
@@ -51,6 +52,7 @@ export default function App() {
           { name: "assistant", list: "/assistant" },
           { name: "packs", list: "/packs", show: "/packs/:id" },
           { name: "disputes", list: "/disputes", show: "/disputes/:id" },
+          { name: "billing", list: "/billing" },
         ]}
         options={{ syncWithLocation: false, disableTelemetry: true }}
       >
@@ -76,6 +78,7 @@ export default function App() {
             <Route path="/packs/:id" element={<PackDetailPage />} />
             <Route path="/disputes" element={<DisputesPage />} />
             <Route path="/disputes/:id" element={<DisputeDetailPage />} />
+            <Route path="/billing" element={<BillingPage />} />
           </Route>
           <Route
             element={

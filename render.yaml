@@ -35,6 +35,12 @@ services:
         generateValue: true
       - key: PAYPAL_MERCHANT_ID
         sync: false
+      # From `python -m scripts.create_pro_plan`. Billing (and the Pro paywall) stays off until set.
+      - key: PAYPAL_PLAN_ID
+        sync: false
+      # Seeds the demo login and synthetic ledger on start. Idempotent: it never duplicates.
+      - key: SEED_DEMO_DATA
+        value: "true"
       - key: CORS_ORIGINS
         value: '["https://kweli-web.onrender.com"]'
       - key: DEMO_USER_PASSWORD

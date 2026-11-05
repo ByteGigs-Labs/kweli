@@ -13,6 +13,7 @@ from api.deps import get_letter_writer
 from api.errors import error_body
 from api.ratelimit import limit_by_key
 from api.security import Principal, current_principal
+from api.services.billing import pro_feature
 from api.services.invoicing import ServiceError
 from api.services.packs import LetterRejected, build, replace_letter
 from packs.citations import MAX_CHARS
@@ -81,7 +82,11 @@ def _owned(db: Session, principal: Principal, pack_id: UUID) -> Pack:
     return pack
 
 
-@router.post("", status_code=status.HTTP_201_CREATED)
+@router.post(
+    "",
+    status_code=status.HTTP_201_CREATED,
+    dependencies=[Depends(pro_feature("Compliance Packs"))],
+)
 def create_pack(
     body: PackRequest,
     principal: Principal = Depends(current_principal),
@@ -120,7 +125,7 @@ def get_pack(
     return _out(_owned(db, principal, pack_id))
 
 
-@router.put("/{pack_id}/letter")
+@router.put("/{pack_id}/letter", dependencies=[Depends(pro_feature("Compliance Packs"))])
 def edit_letter(
     pack_id: UUID,
     body: LetterRequest,

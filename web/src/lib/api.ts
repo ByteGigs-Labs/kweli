@@ -4,6 +4,7 @@ import type {
   AgentReply,
   ChatMessage,
   Agreement,
+  Billing,
   Dispute,
   DisputeSummary,
   AgreementInput,
@@ -147,6 +148,21 @@ export const sandboxDispute = async (
   id: string,
   action: "require_evidence" | "seller_favor" | "buyer_favor",
 ) => (await http.post<Dispute>(disputePath(id, "sandbox"), { action }, { timeout: 60000 })).data;
+
+export const getBilling = async () => (await http.get<Billing>("/v1/billing")).data;
+
+export const startCheckout = async () =>
+  (await http.post<{ approve_url: string }>("/v1/billing/checkout", undefined, { timeout: 30000 })).data;
+
+export const confirmBilling = async (subscriptionId: string) =>
+  (await http.post<Billing>("/v1/billing/confirm", { subscription_id: subscriptionId }, { timeout: 30000 }))
+    .data;
+
+export const cancelBilling = async () =>
+  (await http.post<Billing>("/v1/billing/cancel", undefined, { timeout: 30000 })).data;
+
+export const needsPro = (failure: unknown) =>
+  (failure as { response?: { status?: number } })?.response?.status === 402;
 
 export const errorMessage = (failure: unknown, fallback: string) => {
   const data = (failure as { response?: { data?: { error?: { message?: string } } } }).response?.data;

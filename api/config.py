@@ -37,6 +37,11 @@ class Settings(BaseSettings):
     paypal_client_secret: SecretStr = SecretStr("")
     paypal_webhook_id: str = ""
     paypal_merchant_id: str = ""
+    paypal_plan_id: str = ""
+    pro_price: str = "9.00"
+    pro_currency: str = "USD"
+    api_docs: bool = False
+    uploads_per_minute: int = 30
 
     anthropic_api_key: SecretStr | None = None
     agent_max_steps: int = 6

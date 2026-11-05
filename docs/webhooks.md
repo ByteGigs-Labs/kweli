@@ -17,7 +17,10 @@ Register **one** webhook in the sandbox app (developer.paypal.com → Apps & Cre
 | `BILLING.SUBSCRIPTION.ACTIVATED` | Kweli Pro on |
 | `BILLING.SUBSCRIPTION.CANCELLED` | Kweli Pro off |
 | `BILLING.SUBSCRIPTION.SUSPENDED` | Kweli Pro paused |
-| `PAYMENT.SALE.COMPLETED` | Subscription payment received |
+| `BILLING.SUBSCRIPTION.EXPIRED` | Kweli Pro off |
+| `BILLING.SUBSCRIPTION.UPDATED` | Next billing date |
+
+Every `BILLING.SUBSCRIPTION.*` event re-reads the subscription from PayPal (`GET /v1/billing/subscriptions/{id}`) and only acts on Kweli's own plan. Dispute events carry `dispute_id` instead of `id`, and they're re-read the same way.
 
 Copy the **Webhook ID** into `PAYPAL_WEBHOOK_ID` (in `.env` locally and in Render).
 

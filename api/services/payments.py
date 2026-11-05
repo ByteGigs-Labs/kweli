@@ -185,6 +185,10 @@ def handle_event(db: Session, paypal: PayPalClient, event: dict) -> Outcome:
     resource_id = str(resource.get("id") or resource.get("dispute_id") or "")
     if not resource_id:
         return Outcome("ignored", "event has no resource id")
+    if kind.startswith("BILLING.SUBSCRIPTION."):
+        from api.services.billing import sync as sync_subscription
+
+        return sync_subscription(db, paypal, resource_id)
     if kind in DISPUTE_EVENTS:
         from api.services.disputes import sync
 

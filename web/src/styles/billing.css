@@ -1,0 +1,65 @@
+.billing-note {
+  max-width: 860px;
+  margin: 0 0 calc(var(--space) * 2);
+  padding: calc(var(--space) * 1.5) calc(var(--space) * 2);
+  border-radius: var(--radius-control);
+  background: var(--seal-wash);
+  color: var(--seal);
+  font-weight: 600;
+}
+
+.plans {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: calc(var(--space) * 2);
+  max-width: 860px;
+}
+
+.plan-card {
+  display: grid;
+  align-content: start;
+  justify-items: start;
+  gap: calc(var(--space) * 1.5);
+  padding: calc(var(--space) * 3);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-panel);
+  background: var(--surface);
+}
+
+.plan-current {
+  border: 2px solid var(--ink);
+}
+
+.plan-card h2 {
+  font-size: var(--step-2);
+}
+
+.plan-card p,
+.plan-card ul {
+  margin: 0;
+}
+
+.plan-card ul {
+  padding-left: 1.2em;
+  display: grid;
+  gap: 4px;
+}
+
+.plan-price strong {
+  font-size: var(--step-2);
+}
+
+.plan-tag {
+  padding: 3px 10px;
+  border-radius: 999px;
+  background: var(--seal-wash);
+  color: var(--seal);
+  font-size: var(--step--1);
+  font-weight: 700;
+}
+
+.billing-fine {
+  max-width: 70ch;
+  margin-top: calc(var(--space) * 3);
+  font-size: var(--step--1);
+}

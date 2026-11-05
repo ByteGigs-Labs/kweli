@@ -5,14 +5,16 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session, selectinload
 
 from api.config import get_settings
-from api.db.models import Agreement, Invoice
+from api.db.models import Agreement, Invoice, User
 from api.db.session import get_db
 from api.deps import get_extractor
 from api.listing import ListParams, paginate
 from api.schemas import AcceptLink, AgreementIn, AgreementOut, ThreadIn
 from api.security import Principal, current_principal
 from api.services.agreements import agreement_text, find_or_create_client, issue_accept_link
+from api.services.billing import check_client_limit
 from api.services.extract import EngagementDraft, Extractor, check_against_thread
+from api.services.invoicing import ServiceError
 from audit.log import record
 
 router = APIRouter(prefix="/v1/agreements", tags=["agreements"])
@@ -86,6 +88,10 @@ def create_agreement(
     principal: Principal = Depends(current_principal),
     db: Session = Depends(get_db),
 ) -> AgreementOut:
+    try:
+        check_client_limit(db, db.get(User, principal.user_id), body.client.email)
+    except ServiceError as error:
+        raise HTTPException(error.status, error.message) from None
     client = find_or_create_client(
         db, principal.user_id, body.client.name, body.client.email, body.client.country
     )

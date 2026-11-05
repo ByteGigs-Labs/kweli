@@ -48,7 +48,7 @@ def test_me_returns_identity_without_secrets(logged_in):
     client = logged_in()
     body = client.get("/v1/auth/me").json()
     assert body["name"] == "Amina Wanjiru"
-    assert body["plan"] == "free"
+    assert body["plan"] == "pro"  # billing is off in tests, so every feature is open
     assert "password_hash" not in body
 
 

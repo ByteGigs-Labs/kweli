@@ -61,7 +61,7 @@ def login(body: LoginRequest, response: Response, db: Session = Depends(get_db))
         max_age=settings.session_ttl_hours * 3600,
         **_cookie_options(),
     )
-    return Identity(id=user.id, email=user.email, name=user.name, plan=user.plan)
+    return Identity(id=user.id, email=user.email, name=user.name, plan=effective_plan(user.plan))
 
 
 @router.post("/logout", status_code=status.HTTP_204_NO_CONTENT)
@@ -75,5 +75,15 @@ def logout(request: Request, response: Response, db: Session = Depends(get_db)) 
 @router.get("/me")
 def me(principal: Principal = Depends(current_principal)) -> Identity:
     return Identity(
-        id=principal.user_id, email=principal.email, name=principal.name, plan=principal.plan
+        id=principal.user_id,
+        email=principal.email,
+        name=principal.name,
+        plan=effective_plan(principal.plan),
     )
+
+
+def effective_plan(stored: str) -> str:
+    """What the account can use: everything is open until billing is switched on."""
+    from api.services.billing import billing_enabled
+
+    return stored if billing_enabled() else "pro"
