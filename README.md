@@ -2,7 +2,7 @@
 
 > **Kweli** (Swahili: *true, truth*) is an AI agent that helps freelancers in emerging markets get paid on PayPal **with a complete, verifiable paper trail for every payment**. That way, when PayPal asks *"what is this money for?"*, the answer is ready in one click.
 
-**Live demo:** https://kweli-web.onrender.com *(PayPal sandbox, synthetic data; login in the Devpost text)* · **Video:** *(coming)* · **License:** MIT
+**Live demo:** https://kweli-web.onrender.com *(PayPal sandbox, synthetic data)* · **License:** MIT
 
 <p align="center">
   <img src="docs/screenshots/02-proof-ledger.png" alt="Kweli proof ledger: every PayPal payment in a grid, with a pass, warning or fail badge for each of the seven proof checks" width="900">
@@ -39,9 +39,6 @@ Client agreement  →  PayPal invoice  →  Payment  →  Deliverable  →  ✅ 
 | **5. Compliance Pack** | When an information request arrives, one click builds a PDF + ZIP: a cover letter, a payment-to-document mapping table, agreements, invoices and deliverables, **each cited**. A citation validator blocks any letter that cites a missing document or a wrong amount ([how](docs/compliance-pack.md)) | Invoicing v2, Transaction Search (the records it maps) |
 | **6. Dispute defender** | A client opens a dispute → Kweli re-reads it from PayPal, builds the evidence checklist for that dispute reason from your records, drafts a checked response *(you approve)* and submits it with the agreement, invoice and delivered work attached ([how](docs/disputes.md)) | Disputes v1: show dispute, `provide-evidence` (multipart), sandbox `require-evidence` / `adjudicate` · `CUSTOMER.DISPUTE.*` webhooks |
 | **7. Kweli Pro billing** | Subscriptions for Kweli itself, paid through PayPal | Subscriptions API |
-
-### Why it's good for PayPal too
-Kweli doesn't help anyone get around checks. It **helps honest users pass them**. PayPal gets better-documented emerging-market accounts and fewer false-positive reviews, and it keeps serving a fast-growing freelancer market instead of losing it to alternatives.
 
 ### Screenshots
 Captured from the seeded demo (`python -m scripts.seed --demo-data`), so every client and payment is synthetic.
@@ -203,7 +200,7 @@ kweli/
 ├── web/                      # Refine + AG Grid frontend
 ├── tests/
 ├── scripts/check_paypal.py   # verifies sandbox credentials + features
-├── docs/                     # setup guides, API contract, interview guide
+├── docs/                     # setup guides, API contract, how each feature works
 ├── render.yaml               # Render Blueprint
 ├── docker-compose.yml
 ├── LICENSE
@@ -240,7 +237,7 @@ python -m scripts.create_sandbox_invoice --to <sandbox-client-email> --amount 10
 
 To receive webhooks locally, expose the API (for example with `cloudflared tunnel`) and register `https://<tunnel>/v1/webhooks/paypal` in your app's webhook settings.
 
-### Demo path (about 3 minutes)
+### Try it
 1. Log in with the seeded demo freelancer.
 2. Paste a client thread → the agent drafts an agreement → open the client link → **Accept**.
 3. Open **Assistant** and ask: *"Invoice them for the logo, due in 7 days"* → check the approval card → **Approve** → the invoice arrives in the sandbox client's inbox → pay it.
@@ -263,29 +260,14 @@ To receive webhooks locally, expose the API (for example with `cloudflared tunne
 - **Audit:** a hash-chained log of every agent action and approval.
 - **Data protection:** designed around the Kenya Data Protection Act 2019 (minimisation, export and delete on request).
 
-## 10. Business Model
-
-| Plan | For | Price (indicative) |
-|---|---|---|
-| **Free** | New freelancers | 3 clients, proof ledger, readiness score, agreements, invoices and the assistant. Free |
-| **Pro** | Active freelancers | **USD 9 a month** via **PayPal Subscriptions** (built: server-side checkout, verified on return, kept in step by webhooks): unlimited clients, Compliance Packs, dispute defender |
-| **Agency** | Small agencies and teams | Per-seat pricing, team ledger, subcontractor records |
-| **Partners** | Freelance platforms, coworking spaces, digital-work programmes | Bulk licences and white-label |
-
-## 11. Limitations (honest)
+## 10. Limitations
 
 - PayPal has **no public API for account-limitation information requests**. Kweli prepares the pack, and the user uploads it in PayPal's Resolution Center.
 - Kweli improves documentation. **It cannot guarantee that PayPal will lift a limitation.**
 - Transaction Search data can be delayed in the sandbox, so the live demo relies on webhooks and Invoicing for real-time matching.
+- Kweli doesn't help anyone get around PayPal's checks. It helps honest users meet them, with documents that already exist.
 - Kweli is not legal or financial advice.
 
-## 12. Team
-
-| Name | Owns |
-|---|---|
-| — | CI/CD + Render, auth, proof rules engine, AG Grid ledger, readiness score, audit log, PayPal billing |
-| — | PayPal agent, agreements + client portal, invoicing, document vault, Compliance Pack, dispute defender |
-
-## 13. License
+## 11. License
 
 [MIT](LICENSE)

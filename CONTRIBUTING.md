@@ -5,7 +5,7 @@ Kweli handles payment records and identity documents, so a few rules are non-neg
 ## Ground rules
 
 - **Sandbox only.** Never put live PayPal credentials anywhere in this repo or in Render. `PAYPAL_ENV` must be `sandbox`.
-- **No real personal data.** Demo data is synthetic. Interview notes are anonymised before they are committed.
+- **No real personal data.** Demo data is synthetic.
 - **Never fabricate.** Kweli organises real documents. No code may generate receipts, statements, addresses or backdated agreements.
 - **Humans approve money.** Any agent action that sends an invoice, submits dispute evidence, makes an offer or changes a subscription needs a server-issued approval token from a user click.
 - **Branch and pull request.** Nobody pushes to `main`. CI must be green, and the other person reviews.

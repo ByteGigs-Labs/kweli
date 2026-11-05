@@ -1,8 +1,5 @@
 ## What changed
 
-## Task ID(s)
-<!-- e.g. M-10, F-05 from the tracker -->
-
 ## Checklist
 - [ ] Tests added or updated, and CI is green
 - [ ] Sandbox only: no live PayPal credentials, no real personal data

@@ -16,3 +16,6 @@ vault-data/
 *.pem
 *.key
 .DS_Store
+
+# Internal planning, submission and research notes. Kept on our machines, never pushed.
+private/

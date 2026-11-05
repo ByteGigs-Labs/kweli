@@ -1,6 +1,6 @@
 """Spike: Claude + PayPal Agent Toolkit create one SANDBOX draft invoice from a sentence.
 
-The agent may only create drafts. Sending stays a human action (approval gate, task F-12).
+The agent may only create drafts. Sending stays a human action (the approval gate).
 
 Usage:
   pip install -r requirements-agent.txt

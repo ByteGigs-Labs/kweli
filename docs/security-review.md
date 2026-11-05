@@ -1,6 +1,6 @@
 # Security review
 
-This is the security pass from the roadmap. Each control is listed with where it lives and the test that proves it. The tests run in CI on every push, alongside `pip-audit`, `npm audit`, gitleaks and CodeQL.
+Each security control is listed with where it lives and the test that proves it. The tests run in CI on every push, alongside `pip-audit`, `npm audit`, gitleaks and CodeQL.
 
 | Area | Control | Where | Proved by |
 |---|---|---|---|
@@ -23,5 +23,5 @@ This is the security pass from the roadmap. Each control is listed with where it
 ## Known gaps
 - **No self sign-up.** Accounts are created by the seed script, so there is no email verification or password reset flow yet.
 - **Rate limits are kept in Postgres.** They're fine for one instance. With several instances they still hold, because the store is shared, but they add a write per limited request.
-- **No live load testing.** The free Render plan sleeps when idle, so the API moves to a paid instance before judging.
+- **No live load testing.** The free Render plan sleeps when idle, so a public demo should run on a paid instance.
 - **Third-party payer confirmations** are accepted as an uploaded file. Kweli checks the file's type and hash, not who signed it.

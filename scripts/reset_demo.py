@@ -1,4 +1,4 @@
-"""Put the demo account back to its starting state, for recording or for judges.
+"""Put the demo account back to its starting state, e.g. before showing Kweli to someone.
 
 Usage: python -m scripts.reset_demo
 Deletes the demo user (DEMO_USER_EMAIL) and everything it owns, then seeds it again with the
