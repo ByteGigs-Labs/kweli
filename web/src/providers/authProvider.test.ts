@@ -10,7 +10,7 @@ test("successful login goes to the ledger", async () => {
   vi.spyOn(http, "post").mockResolvedValueOnce({ data: {} });
   expect(await authProvider.login({ email: "a@b.c", password: "x" })).toEqual({
     success: true,
-    redirectTo: "/ledger",
+    redirectTo: "/overview",
   });
 });
 

@@ -15,6 +15,7 @@ from api.routes import (
     invoices,
     ledger,
     portal,
+    readiness,
     webhooks,
 )
 
@@ -43,6 +44,7 @@ def create_app() -> FastAPI:
         audit,
         documents,
         ledger,
+        readiness,
         agent,
     ):
         app.include_router(module.router)

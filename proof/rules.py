@@ -59,6 +59,7 @@ class Facts:
     agreement: AgreementFacts | None = None
     deliverable_name: str | None = None
     recent_amounts_minor: list[int] = field(default_factory=list)
+    payer_confirmation_name: str | None = None
 
 
 def _money(minor: int, currency: str) -> str:
@@ -132,6 +133,13 @@ def p3_payer_is_client(facts: Facts) -> Result:
             "P3", "pass", f"Paid by {agreement.client_name}, the client on the agreement."
         )
     who = payment.payer_name or "someone else"
+    if facts.payer_confirmation_name:
+        return Result(
+            "P3",
+            "pass",
+            f"Paid by {who} for {agreement.client_name}. Their written confirmation is on file: "
+            f"{facts.payer_confirmation_name}.",
+        )
     return Result(
         "P3",
         "warn",
@@ -148,7 +156,7 @@ def p4_agreement_accepted(facts: Facts) -> Result:
             "P4",
             "fail",
             "There's no agreement for this work.",
-            "Send the client an agreement to accept.",
+            "Link this payment to its agreement, or create one and send it to the client.",
         )
     if agreement.status != "accepted" or not agreement.accepted_at:
         return Result(

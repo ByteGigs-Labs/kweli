@@ -539,3 +539,187 @@ a {
   text-decoration: underline;
   cursor: pointer;
 }
+
+/* Ledger toolbar: view switch, search, export */
+.ledger-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: calc(var(--space) * 1.5);
+  margin: 0 0 calc(var(--space) * 2);
+}
+
+.segmented {
+  display: inline-flex;
+  padding: 3px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-control);
+  background: var(--surface);
+}
+
+.segmented button {
+  min-height: 38px;
+  padding: 0 calc(var(--space) * 2);
+  border: 0;
+  border-radius: calc(var(--radius-control) - 3px);
+  background: transparent;
+  color: var(--ink-soft);
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.segmented button[aria-pressed="true"] {
+  background: var(--ink);
+  color: var(--paper);
+}
+
+.search {
+  flex: 1 1 240px;
+  max-width: 360px;
+}
+
+.search input,
+.link-agreement select {
+  width: 100%;
+  min-height: 44px;
+  padding: 0 calc(var(--space) * 1.5);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-control);
+  background: var(--surface);
+  color: var(--ink);
+  font: inherit;
+}
+
+.ledger-toolbar .button-quiet {
+  margin-left: auto;
+}
+
+.ledger-filters {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: calc(var(--space) * 1.5);
+  margin: 0 0 calc(var(--space) * 2);
+}
+
+.ledger-filters .ledger-summary {
+  margin: 0;
+}
+
+.summary-chip,
+.filter-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space);
+  min-height: 40px;
+  padding: 0 calc(var(--space) * 1.5) 0 6px;
+  border: 1px solid transparent;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--ink-soft);
+  font: inherit;
+  cursor: pointer;
+}
+
+.summary-chip:hover {
+  border-color: var(--line);
+}
+
+.summary-chip[aria-pressed="true"] {
+  border-color: var(--ink);
+  background: var(--surface);
+  color: var(--ink);
+}
+
+.filter-chip {
+  padding: 0 calc(var(--space) * 1.5);
+  border-color: var(--ink);
+  background: var(--surface);
+  color: var(--ink);
+  font-weight: 600;
+}
+
+.link-button {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--focus);
+  font: inherit;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+/* Readiness meters */
+.meter {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space);
+  width: 100%;
+}
+
+.meter-track {
+  flex: 1;
+  height: 8px;
+  border-radius: 999px;
+  background: var(--line);
+  overflow: hidden;
+}
+
+.meter-fill {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: currentColor;
+}
+
+.meter-value {
+  min-width: 2ch;
+  color: var(--ink);
+  font-weight: 600;
+  text-align: right;
+}
+
+.meter-ready {
+  color: var(--seal);
+}
+
+.meter-nearly {
+  color: var(--gap);
+}
+
+.meter-at_risk {
+  color: var(--break);
+}
+
+.meter-no_payments {
+  color: var(--ink-soft);
+}
+
+/* Linking a payment by hand */
+.link-agreement {
+  display: grid;
+  gap: var(--space);
+  padding: calc(var(--space) * 2);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-panel);
+}
+
+.link-agreement h3 {
+  font-size: var(--step-0);
+}
+
+.link-agreement p {
+  margin: 0;
+}
+
+.link-agreement-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space);
+}
+
+.link-agreement-row select {
+  flex: 1 1 220px;
+  width: auto;
+}

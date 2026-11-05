@@ -41,9 +41,9 @@ Task **X-01**. After both of you approve this file, changes need a PR approved b
 | `GET/POST /v1/agreements` · `GET /v1/agreements/{id}` · `POST /v1/agreements/{id}/send` | Agreements | Friend |
 | `GET /v1/portal/agreements/{token}` · `POST /v1/portal/agreements/{token}/accept` | Public client portal (no login) | Friend |
 | `GET/POST /v1/invoices` · `POST /v1/invoices/{id}/send` · `POST /v1/invoices/{id}/remind` | Invoices (via the approval gate) | Friend |
-| `GET /v1/ledger` · `GET /v1/ledger/{payment_id}` | Proof ledger + chain | Me |
-| `GET /v1/readiness` | Readiness score + "fix next" | Me |
-| `POST /v1/documents` · `GET /v1/documents/{id}/url` | Encrypted vault upload + signed URL | Friend |
+| `GET /v1/ledger` · `GET /v1/ledger/{payment_id}` · `POST /v1/ledger/{payment_id}/agreement` | Proof ledger + chain; link a payment that has no Kweli invoice to its agreement (`{agreement_id}` or `null` to unlink) | Me |
+| `GET /v1/readiness?limit=` | Readiness score, band, "fix next" in priority order, per-client summary ([docs/readiness.md](readiness.md)) | Me |
+| `POST /v1/documents` · `GET /v1/documents/{id}/url` | Encrypted vault upload + signed URL. Kinds: `deliverable`, `payer_confirmation` (needs `agreement_id`), `correspondence`, `other` | Friend |
 | `POST /v1/agent/messages` | Chat with the agent (streams) | Friend |
 | `POST /v1/agent/actions/{id}/approve` · `POST /v1/agent/actions/{id}/reject` | Approval gate | Friend |
 | `POST /v1/packs` · `GET /v1/packs` · `GET /v1/packs/{id}` | Compliance Packs | Friend |

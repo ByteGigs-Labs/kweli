@@ -90,7 +90,10 @@ class Client(Base):
 class Document(Base):
     __tablename__ = "documents"
     __table_args__ = (
-        _status_check("kind", ("agreement", "deliverable", "correspondence", "id", "other")),
+        _status_check(
+            "kind",
+            ("agreement", "deliverable", "correspondence", "id", "other", "payer_confirmation"),
+        ),
     )
 
     id: Mapped[uuid.UUID] = _uuid_pk()
@@ -192,6 +195,9 @@ class Payment(Base):
     user_id: Mapped[uuid.UUID] = _user_fk()
     paypal_transaction_id: Mapped[str] = mapped_column(String(64), unique=True)
     paypal_invoice_id: Mapped[str | None] = mapped_column(String(64), index=True)
+    agreement_id: Mapped[uuid.UUID | None] = mapped_column(
+        ForeignKey("agreements.id", ondelete="SET NULL"), index=True
+    )
     payer_email: Mapped[str | None] = mapped_column(String(254))
     payer_id: Mapped[str | None] = mapped_column(String(32))
     payer_name: Mapped[str | None] = mapped_column(String(200))

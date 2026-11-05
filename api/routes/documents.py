@@ -21,6 +21,7 @@ from vault.sniff import ALLOWED, safe_filename, sniff
 
 router = APIRouter(prefix="/v1/documents", tags=["documents"])
 LINK_SECONDS = 300
+PROOF_KINDS = ("deliverable", "payer_confirmation")
 
 
 class DocumentOut(BaseModel):
@@ -58,7 +59,9 @@ def _owned(db: Session, principal: Principal, document_id: UUID) -> Document:
 @router.post("", status_code=status.HTTP_201_CREATED)
 async def upload(
     file: UploadFile = File(...),
-    kind: Literal["deliverable", "correspondence", "other"] = Form("deliverable"),
+    kind: Literal["deliverable", "correspondence", "payer_confirmation", "other"] = Form(
+        "deliverable"
+    ),
     agreement_id: UUID | None = Form(None),
     principal: Principal = Depends(current_principal),
     db: Session = Depends(get_db),
@@ -75,6 +78,10 @@ async def upload(
     if mime is None:
         kinds = ", ".join(extension.lstrip(".").upper() for extension in ALLOWED.values())
         raise HTTPException(status.HTTP_415_UNSUPPORTED_MEDIA_TYPE, f"Upload a {kinds} file")
+    if kind == "payer_confirmation" and not agreement_id:
+        raise HTTPException(
+            status.HTTP_422_UNPROCESSABLE_CONTENT, "Choose the agreement this file belongs to"
+        )
     if agreement_id and not db.scalar(
         select(Agreement.id).where(
             Agreement.id == agreement_id, Agreement.user_id == principal.user_id
@@ -116,7 +123,7 @@ async def upload(
             "size": document.size,
         },
     )
-    if agreement_id and kind == "deliverable":
+    if agreement_id and kind in PROOF_KINDS:
         reevaluate_for_agreement(db, agreement_id)
     db.commit()
     return DocumentOut.model_validate(document)
