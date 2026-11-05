@@ -92,7 +92,15 @@ class Document(Base):
     __table_args__ = (
         _status_check(
             "kind",
-            ("agreement", "deliverable", "correspondence", "id", "other", "payer_confirmation"),
+            (
+                "agreement",
+                "deliverable",
+                "correspondence",
+                "id",
+                "other",
+                "payer_confirmation",
+                "pack",
+            ),
         ),
     )
 
@@ -258,6 +266,10 @@ class Dispute(Base):
 
 class Pack(Base):
     __tablename__ = "packs"
+    __table_args__ = (
+        _status_check("letter_source", ("ai", "standard", "edited")),
+        Index("ix_packs_user_created", "user_id", "created_at"),
+    )
 
     id: Mapped[uuid.UUID] = _uuid_pk()
     user_id: Mapped[uuid.UUID] = _user_fk()
@@ -265,7 +277,13 @@ class Pack(Base):
     period_end: Mapped[date] = mapped_column(Date)
     pdf_document_id: Mapped[uuid.UUID | None] = mapped_column(ForeignKey("documents.id"))
     zip_document_id: Mapped[uuid.UUID | None] = mapped_column(ForeignKey("documents.id"))
+    letter: Mapped[str] = mapped_column(Text, default="", server_default="")
+    letter_source: Mapped[str] = mapped_column(
+        String(10), default="standard", server_default="standard"
+    )
+    summary: Mapped[dict] = mapped_column(JSONB, default=dict, server_default="{}")
     created_at: Mapped[datetime] = _created_at()
+    updated_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
 
 
 class AgentAction(Base):

@@ -1,5 +1,6 @@
 """A demo ledger where each payment shows one kind of proof gap. Synthetic data only."""
 
+import hashlib
 from dataclasses import dataclass
 from datetime import UTC, date, datetime, timedelta
 
@@ -98,7 +99,7 @@ def _deliverable(db: Session, user: User, agreement: Agreement, title: str) -> N
         filename=f"{title.lower().replace(' ', '-')}-final.pdf",
         mime="application/pdf",
         size=len(PDF),
-        sha256="0" * 64,
+        sha256=hashlib.sha256(PDF).hexdigest(),
         storage_key="db",
         encrypted_dek="",
     )
