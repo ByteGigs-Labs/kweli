@@ -347,6 +347,7 @@ export function DisputeDetailPage() {
       <p className="back-link">
         <Link to="/disputes">All disputes</Link>
       </p>
+      {loaded.loading && <p className="muted">Loading the dispute…</p>}
       {loaded.error !== undefined && (
         <p className="alert" role="alert">
           This dispute couldn't load.

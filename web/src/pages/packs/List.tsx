@@ -163,7 +163,10 @@ export function PacksPage() {
             Your packs couldn't load.
           </p>
         )}
-        {packs.data && packs.data.length === 0 && <p className="muted">No packs yet.</p>}
+        {packs.loading && <p className="muted">Loading your packs…</p>}
+        {packs.data && packs.data.length === 0 && (
+          <p className="muted">No packs yet. Build one above when PayPal asks what your payments were for.</p>
+        )}
         {packs.data && packs.data.length > 0 && (
           <ul className="pack-rows">
             {packs.data.map((pack) => (

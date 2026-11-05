@@ -178,3 +178,24 @@
     display: none;
   }
 }
+
+.dispute-alert {
+  display: grid;
+  justify-items: start;
+  gap: var(--space);
+  max-width: 980px;
+  margin: 0 0 calc(var(--space) * 3);
+  padding: calc(var(--space) * 2.5) calc(var(--space) * 3);
+  border: 1px solid var(--break);
+  border-radius: var(--radius-panel);
+  background: var(--break-wash);
+}
+
+.dispute-alert h2 {
+  font-size: var(--step-1);
+  color: var(--break);
+}
+
+.dispute-alert p {
+  margin: 0;
+}

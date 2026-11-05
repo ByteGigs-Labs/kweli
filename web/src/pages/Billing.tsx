@@ -97,6 +97,7 @@ export function BillingPage() {
           {failed}
         </p>
       )}
+      {loaded.loading && <p className="muted">Loading your plan…</p>}
       {loaded.error !== undefined && (
         <p className="alert" role="alert">
           Billing couldn't load.
