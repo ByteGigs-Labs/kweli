@@ -47,7 +47,7 @@ Kweli doesn't help anyone get around checks. It **helps honest users pass them**
 Captured from the seeded demo (`python -m scripts.seed --demo-data`), so every client and payment is synthetic.
 
 <details>
-<summary><b>Open the screenshots</b> (9 images)</summary>
+<summary><b>Open the screenshots</b> (14 images)</summary>
 
 #### Sign in
 <img src="docs/screenshots/01-sign-in.png" alt="Kweli sign-in page" width="800">
@@ -76,6 +76,24 @@ The assistant can only propose. The recipient and amount on the card come from t
 
 #### The ledger on a phone
 <img src="docs/screenshots/09-ledger-on-phone.png" alt="Proof ledger summary on a phone" width="320">
+
+#### Readiness: what to fix, in order
+One score for how ready you are for a PayPal review, and the fixes ranked by how much each one matters.
+<img src="docs/screenshots/10-readiness-overview.png" alt="Overview with a readiness score of 88 out of 100, nearly ready, and a ranked fix-next list starting with a payment that has no invoice or agreement" width="800">
+
+#### Readiness by client
+<img src="docs/screenshots/11-readiness-by-client.png" alt="Ledger grouped by client with a readiness meter, payment count, total received and status counts per client" width="800">
+
+#### A Compliance Pack
+One click builds a PDF and ZIP. Every claim in the cover letter cites a payment [P…], a document [D…] or Table 1 [T1].
+<img src="docs/screenshots/12-compliance-pack.png" alt="Compliance pack page with download buttons and a cover letter whose citations are highlighted" width="800">
+
+#### The citation validator blocks a wrong amount
+<img src="docs/screenshots/13-letter-blocked.png" alt="Editing the cover letter with an invented USD 12,000.00 total is blocked with an explanation" width="800">
+
+#### The dispute defender
+The evidence checklist for this dispute reason, built from Kweli's records, and a checked response that only goes to PayPal after approval. This is the seeded demo dispute, so Kweli refuses to send it.
+<img src="docs/screenshots/14-dispute-defender.png" alt="Dispute page showing the client's claim, a strong case with delivered work, accepted agreement and invoice ready to attach, and the drafted response with an approve-and-send step" width="800">
 
 </details>
 
