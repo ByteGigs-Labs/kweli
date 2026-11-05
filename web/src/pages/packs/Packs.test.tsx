@@ -55,7 +55,7 @@ test("building a pack sends the chosen period and opens it", async () => {
   const create = vi.spyOn(api, "createPack").mockResolvedValue(PACK);
   vi.spyOn(api, "getPack").mockResolvedValue(PACK);
   at("/packs");
-  expect(await screen.findByText("No packs yet.")).toBeInTheDocument();
+  expect(await screen.findByText(/No packs yet/)).toBeInTheDocument();
   await userEvent.click(screen.getByLabelText("Last 3 months"));
   await userEvent.click(screen.getByRole("button", { name: "Build the pack" }));
   const [start, end] = create.mock.calls[0] ?? ["", ""];

@@ -125,6 +125,7 @@ export function PackDetailPage() {
       <p className="back-link">
         <Link to="/packs">All packs</Link>
       </p>
+      {loaded.loading && <p className="muted">Loading the pack…</p>}
       {loaded.error !== undefined && (
         <p className="alert" role="alert">
           This pack couldn't load.

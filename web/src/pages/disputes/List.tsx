@@ -21,6 +21,7 @@ export function DisputesPage() {
           </p>
         </div>
       </header>
+      {loaded.loading && <p className="muted">Loading your disputes…</p>}
       {loaded.error !== undefined && (
         <p className="alert" role="alert">
           Your disputes couldn't load. Refresh the page to try again.

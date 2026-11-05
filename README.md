@@ -2,7 +2,7 @@
 
 > **Kweli** (Swahili: *true, truth*) is an AI agent that helps freelancers in emerging markets get paid on PayPal **with a complete, verifiable paper trail for every payment**. That way, when PayPal asks *"what is this money for?"*, the answer is ready in one click.
 
-**Live demo:** `https://kweli-api.onrender.com/health` (API, Day 0) *(PayPal sandbox)* · **License:** MIT
+**Live demo:** https://kweli-web.onrender.com *(PayPal sandbox, synthetic data; login in the Devpost text)* · **Video:** *(coming)* · **License:** MIT
 
 <p align="center">
   <img src="docs/screenshots/02-proof-ledger.png" alt="Kweli proof ledger: every PayPal payment in a grid, with a pass, warning or fail badge for each of the seven proof checks" width="900">
@@ -160,7 +160,7 @@ Kweli's AI drafts and acts. **Deterministic rules decide what counts as proof.**
 | **PayPal Agent Toolkit (Python)** | PayPal's official tool definitions for `get_invoice`, `list_invoices` and `list_transactions`, executed through Kweli's hardened PayPal client ([why](docs/decisions/0001-agent-toolkit.md)) |
 | **PayPal REST APIs (sandbox)** | Invoicing v2, Disputes v1 (`provide-evidence`, plus the sandbox-only `require-evidence`/`adjudicate` to show the full lifecycle), Transaction Search, Subscriptions, Webhooks + signature verification |
 | **AG Grid** | Proof ledger: a badge per proof rule, quick search, status and client filters (external filter), date, text and number column filters, a readiness-by-client view, and CSV export. Only the Community modules used are registered |
-| **Render** | Hosting for the API, frontend, Postgres and background worker |
+| **Render** | Blueprint (`render.yaml`): Docker API that migrates and seeds on start, static web app with a strict CSP that rewrites `/v1/*` to the API so the session cookie stays first-party, and Postgres ([setup](docs/setup-render.md)) |
 
 ## 6. Tech Stack
 

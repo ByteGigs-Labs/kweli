@@ -1,10 +1,11 @@
 import { Link, useNavigate } from "react-router";
 import { ProofBadge } from "../components/ProofBadge";
 import { BAND_LABEL, ScoreMeter } from "../components/ScoreMeter";
-import { getReadiness } from "../lib/api";
+import { getReadiness, listDisputes } from "../lib/api";
 import { formatMoney } from "../lib/money";
 import { useAsync } from "../lib/useAsync";
-import type { FixItem, Readiness } from "../types";
+import { dueText } from "./disputes/shared";
+import type { DisputeSummary, FixItem, Readiness } from "../types";
 import "../styles/overview.css";
 
 const RULE_NAME: Record<string, string> = {
@@ -71,8 +72,31 @@ function FixCard({ item, rank }: { item: FixItem; rank: number }) {
   );
 }
 
+function OpenDisputes({ disputes }: { disputes: DisputeSummary[] }) {
+  const open = disputes.filter(
+    (d) => d.status === "WAITING_FOR_SELLER_RESPONSE" && !d.submitted_at && !d.outcome,
+  );
+  const first = open[0];
+  if (!first) return null;
+  return (
+    <section className="dispute-alert" aria-labelledby="dispute-alert-title">
+      <h2 id="dispute-alert-title">
+        {open.length === 1 ? "A client opened a dispute" : `${open.length} disputes need your response`}
+      </h2>
+      <p>
+        {formatMoney(first.amount_minor, first.currency)} from {first.client ?? "a client"}: {first.reason_label.toLowerCase()}.{" "}
+        {dueText(first.evidence_due_at)}. Kweli has already gathered the evidence.
+      </p>
+      <Link className="button" to={open.length === 1 ? `/disputes/${first.id}` : "/disputes"}>
+        {open.length === 1 ? "Respond to the dispute" : "See the disputes"}
+      </Link>
+    </section>
+  );
+}
+
 export function OverviewPage() {
   const loaded = useAsync(getReadiness, []);
+  const disputes = useAsync(listDisputes, []);
   const readiness = loaded.data;
 
   return (
@@ -90,6 +114,7 @@ export function OverviewPage() {
         </p>
       )}
       {loaded.loading && <p className="muted">Checking your proof…</p>}
+      {disputes.data && <OpenDisputes disputes={disputes.data} />}
 
       {readiness && readiness.band === "no_payments" && (
         <div className="empty" role="status">

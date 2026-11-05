@@ -60,6 +60,10 @@ const renderOverview = () =>
     </MemoryRouter>,
   );
 
+beforeEach(() => {
+  vi.spyOn(api, "listDisputes").mockResolvedValue([]);
+});
+
 afterEach(() => vi.restoreAllMocks());
 
 test("shows the score, what it means and the fixes in priority order", async () => {
@@ -105,4 +109,30 @@ test("before any payment it points to the first agreement", async () => {
   renderOverview();
   expect(await screen.findByText("No payments yet")).toBeInTheDocument();
   expect(screen.getByRole("link", { name: "agreement" })).toHaveAttribute("href", "/agreements/new");
+});
+
+test("an open dispute is the first thing the freelancer sees", async () => {
+  vi.spyOn(api, "getReadiness").mockResolvedValue(READINESS);
+  vi.spyOn(api, "listDisputes").mockResolvedValue([
+    {
+      id: "d1",
+      paypal_dispute_id: "PP-D-1",
+      reason: "MERCHANDISE_OR_SERVICE_NOT_RECEIVED",
+      reason_label: "Work not received",
+      status: "WAITING_FOR_SELLER_RESPONSE",
+      amount_minor: 80000,
+      currency: "USD",
+      client: "Acme Ltd",
+      payment_id: "p1",
+      agreement_id: "a1",
+      evidence_due_at: "2026-11-14T10:00:00Z",
+      outcome: null,
+      submitted_at: null,
+      source: "webhook",
+      created_at: "2026-11-05T10:00:00Z",
+    },
+  ]);
+  renderOverview();
+  expect(await screen.findByRole("heading", { name: "A client opened a dispute" })).toBeInTheDocument();
+  expect(screen.getByRole("link", { name: "Respond to the dispute" })).toHaveAttribute("href", "/disputes/d1");
 });
