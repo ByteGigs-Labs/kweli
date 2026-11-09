@@ -6,5 +6,5 @@
 #   pip install -r requirements-agent.txt
 #   pip install --no-deps -r requirements-nodeps.txt
 -r requirements.txt
-langchain-core==1.7.4
-langchain-anthropic==1.7.9
+langchain-core==1.7.6
+langchain-anthropic==1.7.10
